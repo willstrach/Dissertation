@@ -1,15 +1,72 @@
 \documentclass[twocolumn]{article}
+\usepackage{cite}
 
 \begin{document}
 
-\section{Previous Work}
-\label{sec:PreviousWork}
-\subsection{TF-IDF}
-\label{sec:TFIDF}
+\begin{titlepage}
+    \begin{center}
+        \vspace*{1cm}
+        
+        \Huge
+        \textbf{Using WordNet and Short-Term Memory for Contextual Disambiguation}
+        \vspace{2cm}
+        
+        \Large
+        \textbf{William T. F. Strachan}
+        
+        \vfill
+                
+        \vspace{0.8cm}
+        
+        \Large
+        Word Count - 3000\\
+        Supervisor - Dr Dimitar Kazakov\\
+        Department of Computer Science\\
+        University of York\\
+        20 November 2016
+        
+    \end{center}
+\end{titlepage}
 
-\subsubsection{Sedding and Kazakov}
-\label{sec:SeddingKazakov}
+% ------------------------------ START OF DISSERTATION ------------------------------
+
+\section{Literature Review}
+\label{sec:LitReview}
+In order to define a problem, we must first establish the previous works, so as to build upon them effectively. 
+
+\subsection{Natural Language Processing}
+\label{sec:NLP}
+The problem of natural language processing or, more specifically, input text analysis, has traditionally be broken down into smaller sub-problems\cite{NLPHandbook}:
+\begin{itemize}
+	\item Text Preprocessing
+	\item Lexical Analysis
+	\item Syntactic Parsing
+	\item Semantic Analysis
+\end{itemize}
+The subsequent subsections will discuss each of these in more detail.
+
+\subsubsection{Text Preprocessing}
+\label{sec:TextPreprocessing}
+Before any analysis can take place, the inputted raw text must be converted into a usable format. This, once again, can be broken down into multiple steps\cite{NLPHandbook}: 
+\begin{itemize}
+	\item Character encoding must be identified
+	\item The language can then be identified. Language is most commonly found using one of two methods: Language can be identified by character set, in cases where language uses a unique alphabet, or by character frequency, in other cases.
+	\item Non-useful data, such as images and html formatting must be removed.
+\end{itemize}
+
+\subsubsection{Lexical Analysis}
+\label{sec:LexicalAnalysis}
 
 
+\subsubsection{Syntactic Parsing}
+\label{sec:SyntacticParsing}
+
+
+\subsubsection{Semantic Analysis}
+\label{sec:SemanticAnalysis}
+
+
+\bibliography{references}
+\bibliographystyle{IEEEtran}
 
 \end{document}
