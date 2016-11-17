@@ -47,12 +47,27 @@ The subsequent subsections will discuss each of these in more detail.
 
 \subsubsection{Text Preprocessing}
 \label{sec:TextPreprocessing}
-Before any analysis can take place, the inputted raw text must be converted into a usable format. This, once again, can be broken down into multiple steps\cite{NLPHandbook}: 
+Before any analysis can take place, the inputted raw text must be converted into a usable format. This, once again, can be broken down into multiple steps\cite{NLPHandbook}:
 \begin{itemize}
-	\item Character encoding must be identified
-	\item The language can then be identified. Language is most commonly found using one of two methods: Language can be identified by character set, in cases where language uses a unique alphabet, or by character frequency, in other cases.
-	\item Non-useful data, such as images and html formatting must be removed.
-\end{itemize}
+	\item Document Triage
+
+	\begin{itemize}
+		\item Character encoding must be identified.
+		\item The language can then be identified. %Language is most commonly found using one of two methods: Language can be identified by character set, in cases where language uses a unique alphabet, or by character frequency, in other cases.
+		\item Non-useful data, such as images and html formatting must be removed.
+	\end{itemize}
+	
+	\item Text Segmentation
+	
+	\begin{itemize}
+		\item Individual words (tokens) must be separated from one another. % This is done using white space in space-delimited languages, and comprehensive lists in unsegemented languages
+		\item Text Normalisation; replacing multiple equivalent tokens with one token (e.g. "Ave." and "Avenue").
+		\item Identifying sentences, i.e. locating where a sentence begins and ends. 
+	\end{itemize}
+	
+\end{itemize} 
+
+
 
 \subsubsection{Lexical Analysis}
 \label{sec:LexicalAnalysis}
