@@ -49,7 +49,7 @@ The subsequent subsections will discuss each of these in more detail.
 \label{sec:TextPreprocessing}
 Before any analysis can take place, the inputted raw text must be converted into a usable format. This, once again, can be broken down into multiple steps\cite{NLPHandbook}:
 \begin{itemize}
-	\item Document Triage
+	\item \textbf{Document Triage}
 
 	\begin{itemize}
 		\item Character encoding must be identified.
@@ -57,7 +57,7 @@ Before any analysis can take place, the inputted raw text must be converted into
 		\item Non-useful data, such as images and html formatting must be removed.
 	\end{itemize}
 	
-	\item Text Segmentation
+	\item \textbf{Text Segmentation}
 	
 	\begin{itemize}
 		\item Individual words (tokens) must be separated from one another. % This is done using white space in space-delimited languages, and comprehensive lists in unsegemented languages
@@ -66,21 +66,39 @@ Before any analysis can take place, the inputted raw text must be converted into
 	\end{itemize}
 	
 \end{itemize} 
-
+% ########################
+% #  UNFINISHED SECTION  #
+% ########################
 
 
 \subsubsection{Lexical Analysis}
 \label{sec:LexicalAnalysis}
+One word can have multiple forms, for example "judge" (the lemma) has the forms \{"judge", "judges", "judging", "judged"\} (morphological variants).  The job of Lexical Analysis is to replace all morphological variants of a word, with their corresponding lemma, a process known as stemming \cite{NLPHandbook}.
 
-
+% In terms of ease of token identification, it can be seen conceptually how this process is beneficial. With that said, when we consider the amount of information in a word, it can similarly be realised that we lose information about the form of a word, for example plural/singular and tense.
 \subsubsection{Syntactic Parsing}
 \label{sec:SyntacticParsing}
-
+Whwn derviving meaning from sentances, the grammatical structure can provide important insight. The Syntactic parsing technique extracts this infomation using two processes \cite{NLPAlmostFromScratch}: 
+\begin{itemize}
+	\item \textbf{Part-of-speech Tagging}
+	
+	\begin{itemize}
+		\item Each word is given tags denoting their syntactic role (e.g. noun/adjective/verb).
+	\end{itemize}		
+	
+	\item \textbf{Chunking}
+	
+	\begin{itemize}
+		\item Noun phrases and verb phrases are detected and tagged using "begin chunk" and "inside chunk" labels
+	\end{itemize}	
+	
+\end{itemize}
 
 \subsubsection{Semantic Analysis}
 \label{sec:SemanticAnalysis}
+Semantics . 
 
-
+\newpage
 \bibliography{references}
 \bibliographystyle{IEEEtran}
 
