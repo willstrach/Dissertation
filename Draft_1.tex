@@ -1,4 +1,4 @@
-\documentclass[twocolumn]{article}
+\documentclass[]{article}
 \usepackage{cite}
 \usepackage{hyperref}
 
@@ -29,12 +29,14 @@
     \end{center}
 \end{titlepage}
 
+\tableofcontents
+\newpage
 % ------------------------------ START OF DISSERTATION ------------------------------
 
 \section{Literature Review}
 \label{sec:LitReview}
 In order to define a problem, we must first establish the previous works, so as to build upon them effectively. 
-
+		
 %--------------------- NLP
 
 \subsection{Natural Language Processing}
@@ -107,8 +109,24 @@ The semantics of a sentence, is the meaning given by it's tokens \cite{SemanticA
 
 
 %------------ Memory Models
-\subsection{Memory Models}
-\label{sec:MemModels}
+\subsection{Psycholinguistics}
+\label{sec:Psycholinguistics}
+Language understanding is a problem which, it can be stated, is solved by the human brain. From this satatement, it can be derived that a computational solution could be effectively built around knowledge of the processes at work in the brain. The process of language comprehension can be described using the working memory model \cite{MemoryBaddeleyEysenkAnderson}.
+
+According to Baddely et al. \cite{MemoryBaddeleyEysenkAnderson} there exist multiple, special purpose, memory structures within two main categories, the Short-term Store and the Long-term Store.  
+
+\subsubsection{Long-term Store}
+\label{LongTerm}
+The long-term store (LTS) contains semi-permanent information. Within the LTS, there exist Explicit and Implicit memory structures. The contents of the Implicit memory describe skills and methods of doing things, whereas the Explicit memory contains factual information\cite{MemoryBaddeleyEysenkAnderson}. When considering these structures, it can be seen that Explicit memory is of greater interest in the context of NLP.
+
+Within the Explicit memory exists knowledge of semantics \cite{MemoryBaddeleyEysenkAnderson}. The information held here not only defines concepts (meanings of word forms), but also their attributes and rules of use. In 1966, M. Quillain proposed a model of Semantic Memory \cite{SemanticMemoryQuillain}. The model consists of a graph of nodes, each representing a concept, connected by edges of differing types, each representing a different syntactic feature (for example, hypernym). 
+
+
+\subsubsection{Short-term Store}
+\label{ShortTerm}
+The short-term store (STS) is a structure of limited capacity, used to store items for periods usually of no more than a few seconds \cite{MemoryBaddeleyEysenkAnderson}. In 1955, G. Miller, based upon previous experimental results, concluded that the size of the STS existed in the realm of 7$\pm$2 items of information \cite{SevenPlusMinusTwo}. 
+
+In 1971, R. Atkinson and R. Shiffrin proposed a model of the STS \cite{ControlProcessesSTMAtkinson}. In this model, the STS can both send information to, and draw information from the LTS. Inputs from the sensory registers (memory structures holding information relating to inputs from senses) are also sent to the STS. Atkinson and Shiffrin proposed that, over time, the activation of items in the STS decreased; they went on to theorise that items could be lost from the STS, only when a new, more highly activated item could take its place. To counter this loss of activation, the authors discussed the control process, rehearsal. This process makes use of repetition to increase the activation of items in memory, decreasing their chance of loss. 
 
 %------------ PREVIOUS WORK
 \subsection{Previous Work}
