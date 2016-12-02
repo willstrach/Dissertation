@@ -1,6 +1,10 @@
 \documentclass[]{article}
 \usepackage{cite}
 \usepackage{hyperref}
+\usepackage{multicol}
+
+
+\setlength{\parskip}{0.5em}
 
 \begin{document}
 
@@ -59,9 +63,7 @@ Before any analysis can take place, the inputted raw text must be converted into
 	\begin{itemize}
 		\item Character encoding must be identified.
 		\item The language can then be identified. %Language is most commonly found using one of two methods: Language can be identified by character set, in cases where language uses a unique alphabet, or by character frequency, in other cases.
-		\item Non-useful data, such as images and html formatting must be removed.
-	\end{itemize}
-	
+		\item Non-useful data, such as images and html formatting must be removed.			\end{itemize}	
 	\item \textbf{Text Segmentation}
 	
 	\begin{itemize}
@@ -128,9 +130,139 @@ The short-term store (STS) is a structure of limited capacity, used to store ite
 
 In 1971, R. Atkinson and R. Shiffrin proposed a model of the STS \cite{ControlProcessesSTMAtkinson}. In this model, the STS can both send information to, and draw information from the LTS. Inputs from the sensory registers (memory structures holding information relating to inputs from senses) are also sent to the STS. Atkinson and Shiffrin proposed that, over time, the activation of items in the STS decreased; they went on to theorise that items could be lost from the STS, only when a new, more highly activated item could take its place. To counter this loss of activation, the authors discussed the control process, rehearsal. This process makes use of repetition to increase the activation of items in memory, decreasing their chance of loss. 
 
+\subsubsection{Disambiguation Models}
+\label{DisambiguationModels}
+In some cases, when assigning meaning to words, ambiguity can arise. Some words have multiple concepts, for example, bank can refer to a building, or a sloped surface alongside a body of water. In such cases, the brain uses some process to select the correct concept. One such model of this disambiguation is the Multiple-access model \cite{PsychologyOfLanguage}.
+
+According to the multiple-access model, when presented with an ambiguious word, initially all corresponding concepts are activated \cite{AccessingLexicalAmbiguities}. The most appropriate concept is then chosen using context and frequency.
+
+Previously, we established that the process of disambiguation begins with the activation of all possible word concepts. The context-sensitive model deals with the use of context and frequency in the selection of the most appropriate of these \cite{PsychologyOfLanguage}. In cases where the context is strong, i.e. the correct concept can be chosen using it's surrounding context, the context is primarily relied upon for disambiguation. In the opposite case, i.e. when context gives little indication of which is the correct concept, the most frequenly used concept is used, assuming it fits with the available context.
+
+
+%------------ WORDNET
+\subsection{Wordnet}
+\label{Wordnet}
+In 1990, it was noted by G. Miller et al. that current attemps to organise the english lexicon, i.e. conventional dictionaries, offered few benefits when used in conjunction with computers \cite{WN1Introduction}. Wordnet was an effort to produce a dictonary, containing more information than a conventional dictionary, that could be useful for computational applications.
+
+Central to the design of wordnet, is the idea of synsets \cite{WN1Introduction}. The authors began using the assumption that all concepts can be uniquely defined by their set of synonyms (words which share like meaning). In most cases, this assumption holds true, though, in cases where more detail is required, a "gloss" was added \cite{WN1Introduction}.
+
+Wordnet builds upon models of the semantic memory, such as that discussed in the \hyperref[LongTerm]{Long-term store section} \cite{WN1Introduction}. The overall structure relies on four main semantic relations:
+
+\begin{itemize}
+	\item Synonymy
+	\begin{itemize}
+		\item If two words are to be called synonyms, they must share at least one like meaning.
+	\end{itemize}
+	
+	\item Atonymy
+	\begin{itemize}
+		\item Conceptually, Atonymy can be seen as the opposite of Synonymy. Atonymy is difficult to define, as not all words which share opposite meaning can be called atonyms, for example, \{up, down\} is an atonym pair, but \{up, fall\} is not.
+	\end{itemize}
+	
+	\item Hyponymy
+	\begin{itemize}
+		\item If we consider a a synset to be a object-oriented class, its hypernym can be considered its parent class, for example, birch is a type of tree.
+	\end{itemize}
+	
+	\item Meronymy \label{Meronym}
+	\begin{itemize}
+		\item Meronymy is relationship between two synsets where one is a part of another, for example, a goat has horns, therefore horn is a meronym of goat.
+	\end{itemize}
+	
+\end{itemize}
+
+It is common knowledge that words can fall into one of a number of categories, nouns, adjectives, verbs and adverbs. G. Miller et al. note that, due to the differences in the relations between words in these categories, each type has differs in the structure they produce and are therefore held in different files \cite{WN1Introduction}. The proceeding subsections will go into each of thesecategories in more detail.
+
+\subsubsection{Nouns}
+\label{Nouns}
+G. Miller et al. note that a noun can be defined using only its immediate hypernym, and how it differs from its hypernyms other hyponyms \cite{WN2Nouns}. From this, it can be seen that hyponymy is perhaps the most important relation in the organisation of nouns. For this reason, nouns form a hierachical structure in wordnet.
+
+Wordnet's designers stated the assumption that all nouns can be contained in a single hierachial structure \cite{WN2Nouns}. The issue with having a single word, of which all other words are hyponyms, is that this hypernym is relatively meaningless. It was instead decide to divide all words into 25 separate files, each containing a hierachical tree beginning with one of the following synsets \cite{WN2Nouns}:
+
+\begin{multicols}{2}
+\begin{itemize}
+	\item[] \{act, action, activity\}
+	\item[] \{animal, fauna\}
+	\item[] \{artifact\}
+	\item[] \{attribute, property\}
+	\item[] \{body, corpus\}
+	\item[] \{cognition, knowledge\}
+	\item[] \{communication\}
+	\item[] \{event, happening\}
+	\item[] \{feeling, emotion\}
+	\item[] \{food\}
+	\item[] \{group, collection\}
+	\item[] \{location, place\}
+	\item[] \{motive\}
+	\item[] \{natural object\}
+	\item[] \{natural phenomenon\}
+	\item[] \{person, human being\}
+	\item[] \{plant, flora\}
+	\item[] \{possession\}
+	\item[] \{process\}
+	\item[] \{quantity, amount\}
+	\item[] \{relation\}
+	\item[] \{shape\}
+	\item[] \{state, condition\}
+	\item[] \{substance\}
+	\item[] \{time\}
+\end{itemize}
+\end{multicols}
+
+Other than synonymy, nouns have three other important features \cite{WN2Nouns}:
+\begin{itemize}
+	\item Attributes
+	\begin{itemize}
+		\item The attributes of a noun consist of adjectives which distinguish it from other hyponyms of its hypernym, for example \{huge, green, fluffy\}.
+	\end{itemize}		
+	
+	\item Parts
+	\begin{itemize}
+		\item The parts of a noun consist of its meronyms, described \hyperref[Meronym]{previously}.
+	\end{itemize}		
+	
+	\item Functions
+	\begin{itemize}
+		\item The functions of a noun consist of verbs which are associated with its actions, for example chair has the functions \{sit, rest\}.
+	\end{itemize}		
+	
+\end{itemize}
+
+\subsubsection{Adjectives}
+\label{Adjectives}
+Adjectives in can be divided into three distinct groups \cite{WN3Adjectives}:
+\begin{itemize}
+	\item Descriptive Adjectives
+	\begin{itemize}
+		\item 
+	\end{itemize}		
+	
+	\item Reference-Modifying Adjectives
+	\begin{itemize}
+		\item 
+	\end{itemize}		
+	
+	\item Color Adjectives
+	\begin{itemize}
+		\item 
+	\end{itemize}		
+	
+\end{itemize}
+
+
+\subsubsection{Verbs}
+\label{Verbs}
+
+
 %------------ PREVIOUS WORK
 \subsection{Previous Work}
 \label{sec:PrevWork}
+
+\subsubsection{Kazakov}
+
+\subsubsection{•}
+
+
 
 
 \newpage
