@@ -2,8 +2,9 @@
 \usepackage{cite}
 \usepackage{hyperref}
 \usepackage{multicol}
+\usepackage{graphicx}
 
-
+\graphicspath{ {images/} }
 \setlength{\parskip}{0.5em}
 
 \begin{document}
@@ -103,10 +104,7 @@ Whwn derviving meaning from sentances, the grammatical structure can provide imp
 
 \subsubsection{Semantic Analysis}
 \label{sec:SemanticAnalysis}
-The semantics of a sentence, is the meaning given by it's tokens \cite{SemanticAnalysisAPracticalIntro}. The topic of semantic analysis will be expanded upon on in the proceeding subsections.
-
-\subsubsection{Latent Semantic Analysis}
-\label{sec:LSA}
+The semantics of a sentence, is the meaning given by it's tokens \cite{SemanticAnalysisAPracticalIntro}. The topic of semantic analysis will be expanded upon on in the \hyperref[sec:PrevWork]{Previous Works Section}.
 
 
 
@@ -144,7 +142,7 @@ Previously, we established that the process of disambiguation begins with the ac
 \label{Wordnet}
 In 1990, it was noted by G. Miller et al. that current attemps to organise the english lexicon, i.e. conventional dictionaries, offered few benefits when used in conjunction with computers \cite{WN1Introduction}. Wordnet was an effort to produce a dictonary, containing more information than a conventional dictionary, that could be useful for computational applications.
 
-Central to the design of wordnet, is the idea of synsets \cite{WN1Introduction}. The authors began using the assumption that all concepts can be uniquely defined by their set of synonyms (words which share like meaning). In most cases, this assumption holds true, though, in cases where more detail is required, a "gloss" was added \cite{WN1Introduction}.
+\label{Synsets}Central to the design of wordnet, is the idea of synsets \cite{WN1Introduction}. The authors began using the assumption that all concepts can be uniquely defined by their set of synonyms (words which share like meaning). In most cases, this assumption holds true, though, in cases where more detail is required, a "gloss" was added \cite{WN1Introduction}.
 
 Wordnet builds upon models of the semantic memory, such as that discussed in the \hyperref[LongTerm]{Long-term store section} \cite{WN1Introduction}. The overall structure relies on four main semantic relations:
 
@@ -154,7 +152,7 @@ Wordnet builds upon models of the semantic memory, such as that discussed in the
 		\item If two words are to be called synonyms, they must share at least one like meaning.
 	\end{itemize}
 	
-	\item Atonymy
+	\item Atonymy \label{Atonym}
 	\begin{itemize}
 		\item Conceptually, Atonymy can be seen as the opposite of Synonymy. Atonymy is difficult to define, as not all words which share opposite meaning can be called atonyms, for example, \{up, down\} is an atonym pair, but \{up, fall\} is not.
 	\end{itemize}
@@ -230,37 +228,67 @@ Other than synonymy, nouns have three other important features \cite{WN2Nouns}:
 
 \subsubsection{Adjectives}
 \label{Adjectives}
-Adjectives in can be divided into three distinct groups \cite{WN3Adjectives}:
+Adjectives in can be divided into four distinct groups, each implying a different structure of semantic links \cite{WN3Adjectives}:
 \begin{itemize}
 	\item Descriptive Adjectives
 	\begin{itemize}
-		\item 
+		\item As stated in the \hyperref[Nouns]{previous section}, nouns have attributes. Descriptive adjectives act as modifiers for these attributes: for example, a building has a height, by saying "tall building", the height attribute is given a value \cite{WN3Adjectives}. Atonymy, defined \hyperref[Atonym]{previously}, is considered by wordnet's designers to be the most important relation between descriptive adjectives. Unfortuantely, not all adjectives have atonyms, leading to the designer's addition of an indirect antonym" semantic link, between synonyms of a word and its atonym \cite{WN3Adjectives}. These semantic links give rise to a structure made up of pairs, linked to one another by their synonyms.
 	\end{itemize}		
-	
+		
 	\item Reference-Modifying Adjectives
 	\begin{itemize}
-		\item 
-	\end{itemize}		
+		\item Reference-modifying adjectives have an adverb form which can be used to convey the same meaning \cite{WN3Adjectives}. For example, the noun-phrase "the former manager", can be modified to become "the man who was formerly a manager", without diverging from its original meaning. There exist relatively few examples of this category, so no overarching structure emerges, that being said, in some cases, the atonym relation does occur \cite{WN3Adjectives}.
+	\end{itemize}
 	
-	\item Color Adjectives
+	\item Colour Adjectives
 	\begin{itemize}
-		\item 
+		\item As their name suggests, colour adjctives concern the value of the colour attribute. This definition implies that these words should, in fact, fit into the descriptive adjective category. Their separation is given by colour adjectives lack of true atonym (excluding modifiers such as "light" and "dark") \cite{WN3Adjectives}. The lack of clear semantic relations between these words poses a problem for their organisation, leading wordnet's designers to link them using their definitions, i.e. using hue, lightness and saturation.
+	\end{itemize}	
+	
+	\item Relational Adjectives
+	\begin{itemize}
+		\item In the phrase "maternal instinct", it can be seen that the adjective is derived from a noun, in this case "mother"; this is the defining feature of relational adjectives \cite{WN3Adjectives}. In wordnet, relational adjectives are linked to their noun form, meaning they don't posess their own structure, instead falling into that described in the \hyperref[Nouns]{Noun section}.
 	\end{itemize}		
+		
 	
 \end{itemize}
 
 
 \subsubsection{Verbs}
 \label{Verbs}
+In C. Fellbaums 1990 paper, "English Verbs as a Semantic Net", she discussed the lack of true synonymy across the verb category \cite{WN4Verbs}. This is an issue for Wordnet's designers, with their reliance on \hyperref[Synsets]{synsets}. The author goes on to describe the solution, periphrases, the use of verb phrases to give more meaning to a simple verb. In the paper, the example synset, \{swim, travel through water\} was given. 
 
+The relationships between verbs follow a hierachy shown in Figure \ref{fig:WN4Verbs_pp15}, with each type elaborated upon in the following paragraphs.
+
+\begin{figure}[h]
+	\includegraphics[scale=0.7]{WN4Verbs_pp15.png}
+	\caption{HIERACHY OF SEMANTIC RELATIONS BETWEEN VERBS \cite[p.~15]{WN4Verbs}}
+	\label{fig:WN4Verbs_pp15}
+\end{figure}
+
+\textbf{Entailment} is a relation, simlar in nature to hyponymy. A verb (a) is said to entail another (b) if, when b is substituted for a in a sentace, the truth value of the sentance remains the same \cite{WN4Verbs}. For example, "run" entails "move", "she ran" can also be described by "she moved". If a entails b, and b entials a, a and b are synonyms.
+
+\textbf{Temporal Inclusion} is a form of entailment where one verb (a) is temporally included in another (b) if, b can only occur during the same time period as a\cite{WN4Verbs}. For example, "swallow" is temporally included by "consume". If a can also occur without b, the entailment can be called \textbf{Proper Inclusion}.
+
+\textbf{Troponomy} is a type of entailment where a verb (a) can be said to be a way of doing another verb (b) \cite{WN4Verbs}. For example, "to nap" is a troponym of "to sleep". 
+
+\textbf{Backward Presupposition} is a relation which occurs when one verb (a)  is a precondition of a verb (b) \cite{WN4Verbs}. For example, one must "play" before they can "win".
+
+\textbf{Cause} is a relation where one verb (a) is considered the causative verb, and another (b) is considered the resultative verb, i.e. a causes b to occur \cite{WN4Verbs}. For example, "to teach" is related to "to learn".
+
+The entailment relation leads to a similar structure to that of nouns, a hierachical tree. This structure differs though in its relative lack of depth, caused by the increased average number of concepts per word, when compared to nouns \cite{WN4Verbs}. 
 
 %------------ PREVIOUS WORK
 \subsection{Previous Work}
 \label{sec:PrevWork}
 
+\subsubsection{Latent Semantic Analysis}
+\label{sec:LSA}
+In 1997, T. Laundaur and S. Dumais proposed a purely statistical method of semantic analysis, called Latent Semantic Analysis (LSA) \cite{LatentSemanticAnalysis}. The model can be visaulised as a set of nodes, each representing a word 
+
 \subsubsection{Kazakov}
 
-\subsubsection{•}
+\subsubsection{}
 
 
 
