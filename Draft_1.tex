@@ -35,6 +35,7 @@
 \end{titlepage}
 
 \tableofcontents
+
 \newpage
 % ------------------------------ START OF DISSERTATION ------------------------------
 
@@ -88,8 +89,8 @@ One word can have multiple forms, for example "judge" (the lemma) has the forms 
 \label{sec:SyntacticParsing}
 Whwn derviving meaning from sentances, the grammatical structure can provide important insight. The Syntactic parsing technique extracts this infomation using two processes \cite{NLPAlmostFromScratch}: 
 \begin{itemize}
-	\item \textbf{Part-of-speech Tagging}
-	
+	\item \textbf{Part-of-speech (PoS) Tagging}
+	\label{PoSTag}
 	\begin{itemize}
 		\item Each word is given tags denoting their syntactic role (e.g. noun/adjective/verb).
 	\end{itemize}		
@@ -129,7 +130,7 @@ The short-term store (STS) is a structure of limited capacity, used to store ite
 In 1971, R. Atkinson and R. Shiffrin proposed a model of the STS \cite{ControlProcessesSTMAtkinson}. In this model, the STS can both send information to, and draw information from the LTS. Inputs from the sensory registers (memory structures holding information relating to inputs from senses) are also sent to the STS. Atkinson and Shiffrin proposed that, over time, the activation of items in the STS decreased; they went on to theorise that items could be lost from the STS, only when a new, more highly activated item could take its place. To counter this loss of activation, the authors discussed the control process, rehearsal. This process makes use of repetition to increase the activation of items in memory, decreasing their chance of loss. 
 
 \subsubsection{Disambiguation Models}
-\label{DisambiguationModels}
+\label{sec:DisambiguationModels}
 In some cases, when assigning meaning to words, ambiguity can arise. Some words have multiple concepts, for example, bank can refer to a building, or a sloped surface alongside a body of water. In such cases, the brain uses some process to select the correct concept. One such model of this disambiguation is the Multiple-access model \cite{PsychologyOfLanguage}.
 
 According to the multiple-access model, when presented with an ambiguious word, initially all corresponding concepts are activated \cite{AccessingLexicalAmbiguities}. The most appropriate concept is then chosen using context and frequency.
@@ -284,14 +285,64 @@ The entailment relation leads to a similar structure to that of nouns, a hierach
 
 \subsubsection{Latent Semantic Analysis}
 \label{sec:LSA}
-In 1997, T. Laundaur and S. Dumais proposed a purely statistical method of semantic analysis, called Latent Semantic Analysis (LSA) \cite{LatentSemanticAnalysis}. The model can be visaulised as a set of nodes, each representing a word 
+In 1997, T. Laundaur and S. Dumais proposed a purely statistical method of semantic analysis, called Latent Semantic Analysis (LSA) \cite{LatentSemanticAnalysis}. The model can be visualised as a set of nodes, each representing a word, existing in semntic space. Words placed close together can be said to have similar meaning, and when close enough together, can be called synonyms. 
 
-\subsubsection{Kazakov}
+When training the model, words which exist in the same context (i.e sentence, paragraph) are linked by a distance derived from their distance in the text. This distance is then adjsted according to similar occurences in more training data. Given enough training data, the distances between each node can be used to give the most likely synonyms of a word, given the context \cite{LatentSemanticAnalysis}.
 
-\subsubsection{}
+The authors found that, when presented with a synonym test, the model's best performance gave 64.4\% correct answers , which, when compared to US undergraduates for whom English is not their first language (scoring 64.5\% on average), could be considered to be reasonably effective \cite{LatentSemanticAnalysis}. This model only considers likelyhood, which, as discussed in the \hyperref[sec:DisambiguationModels]{fDisambiguation Models section}, is only one of the two methods the brain is theorised to use for this process. By using a similar method in conjunction with a context focused model, a more accurate and useful model could be produced.
+
+\subsubsection{Extended TF-IDF}
+\label{sec:TFIDF}
+
+TF-IDF is an algorithm which, when given a document, outputs its most important words, often used to organise a set of documents into categories. This is done by calculating the importance of each word in the document \cite{TFIDF}, using the formula:
+\[t_i = f_t * (log_2(n)-log_2(f_d)+1)\]
+Where \(t_i\) is the importance of the word, \(f_t\) is the frequency of the word within the document, \(n\) is the number of documents in the corpura, and \(f_d\) is the frequency of the word across all documents in the corpura \cite{SeddingKazakov}. The  words with the highest importance are then outputted.
+
+In 2004, J. Sedding and D. Kazakov proposed an extension to the TF-IDF algorithm, using \hyperref[Wordnet]{Wordnet}. The aim of the paper was to include extra information provided by wordnet (synsets and hypernyms) in conjuncton with \hyperref[PoSTag]{PoS tagging}, to provide an output more suited to the categorisation of documents \cite{SeddingKazakov}. The authors ran multiple experiments, in order to compare different usage of additional information. unfortunately, it was found that their method was less effective than TF-IDF alone. As the authors stated, this is likely due to the lack of disambiguation, i.e. all synsets were used for each word, adding noise.
+
+\subsubsection{Neural Networks}
+\label{sec:NeuralNetwork}
 
 
+\subsubsection{Previous use of Wordnet and Short-term Memory for Disabiguation}
+\label{sec:MattBurke}
 
+In 2007, a University of York student, M. Burke, produced a project with a simlar aim to the one this report describes. This project builds upon the work and findings of my predecessor. The model developed made use of memory structures based upon those discussed in the \hyperref[sec:Psycholinguistics]{Psycholinguistics section}, i.e. Short-term (STM) and Semantic memories \cite{MattBurkePrevious}. The Short-term memory, was a list, containing synsets, each with its own activation, and Wordnet was used as the Semantic memory, once again each synset has its own activation.    
+
+As words are encountered, their activation, and the activation of their hypernyms is increased. The activation increase of the initial synset was found through experimentation, though the activation increase of hypernyms differed according to the below equation \cite{MattBurkePrevious}. 
+\[H = \sum\limits_{i=1}^N S_i \times A\]
+Where \(A\) is the attenuation, found through experimentation, \(S_i\) is the activation of the hyponyms. This model was used to prevent more general synsets dominating the short-term memory, whilst boosting hypernyms of synsets more if a similar synset also occurs in close proximity \cite{MattBurkePrevious}.
+
+The author noted that, highly activated synsets could remain in the short-term memory indefinitely. To counter this issue, and to remain in line with the memory models discussed in the \hyperref[ShortTerm]{Short-term store section}, the process of forgetting was added to the model, by multiplying the activation value by a number found by experimentation \cite{MattBurkePrevious}. Forgetting occurs over time, decreasing the activations of items in the Short-term memory and the Semantic memory, the latter by a greater degree.
+
+In the proposed model, the corpus is processed sentence by sentence. Two methods of disambiguation were proposed, with both cases beginning by removing non-useful words, and converting all words into their base forms (e.g. "flies" $\Rightarrow$ "fly"), each model differs in its use of the contents of the short term memory.
+\begin{itemize}
+	\item[] \textbf{Hypernym-first - } The hypernyms of all words are activated, with the synsets with the highest activation bieng used to disambguate each word \cite{MattBurkePrevious}.
+	\item[] \textbf{STM-first - } The item in the Short term memory with the highest activation's hyponyms are searched until one of the synsets present in the sentence are found \cite{MattBurkePrevious}.
+\end{itemize}
+
+
+As mentioned previously, the values of some variables were found using experimentation. In these experiments, four variables were altered \cite{MattBurkePrevious}:
+\begin{itemize}
+	\item Disambiguation Method
+	\begin{itemize}
+		\item[] The author found that STM-first was marginally better (1\% difference)
+	\end{itemize}
+	\item Short-term memory size
+	\begin{itemize}
+		\item[] It was found that a STM size of 5 was optimal, with a 67\% accuracy.
+	\end{itemize}
+	\item The Attenuation value
+	\begin{itemize}
+		\item[] The author found that an attenuation value of between 0.7 and 0.9 gave the best result, with an accuracy of 67\%.
+	\end{itemize}
+	\item Forgetfulness
+	\begin{itemize}
+		\item[] It was found that a small amount of forgetfulness (multiply activation by 0.95) in conjunction with a small difference in forgetfulness between Semantic and Short-term memories (multiplied by 1.05), produced the best result \cite{MattBurkePrevious}.
+	\end{itemize}
+\end{itemize}
+
+Unfortunately, the model failed to produce the correct synset significantly more accurately than the author's baseline (selecting the most common synset) \cite{MattBurkePrevious}. As suggested in the report, this may be due to semantic links, which occur in the brain, not being available or utilsed by the model. Though, it may also be the case that the mathematical models used were inaccurate, with less linear functions being required.
 
 \newpage
 \bibliography{references}
