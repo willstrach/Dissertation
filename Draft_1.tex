@@ -3,9 +3,13 @@
 \usepackage{hyperref}
 \usepackage{multicol}
 \usepackage{graphicx}
+\usepackage{listings}
+\usepackage{pgfplots}
+\usepackage{tcolorbox}
 
 \graphicspath{ {images/} }
 \setlength{\parskip}{0.5em}
+\pgfplotsset{width=10cm,compat=1.9}
 
 \begin{document}
 
@@ -302,7 +306,7 @@ In 2004, J. Sedding and D. Kazakov proposed an extension to the TF-IDF algorithm
 
 \subsubsection{Neural Networks}
 \label{sec:NeuralNetwork}
-In recent years the use of Neural Networks, more specifically Deep Neural Networks, in the solving of computational problems has dramatically increased. More recently, this technique has been applied to the problem of natural language processing. As discussed in the \hyperref[sec:fNLP]{Natural Language Processing section}, it was shown that assigning varyng labels to words and phrases (i.e. categorisation) made up a large proportion of the processes, a job neural networks are wellsuited to, and often associated with \cite{NeuralNetworks}. 
+In recent years the use of Neural Networks, more specifically Deep Neural Networks, in the solving of computational problems has dramatically increased. More recently, this technique has been applied to the problem of natural language processing. As discussed in the \hyperref[sec:NLP]{Natural Language Processing section}, it was shown that assigning varyng labels to words and phrases (i.e. categorisation) made up a large proportion of the processes, a job neural networks are wellsuited to, and often associated with \cite{NeuralNetworks}. 
 
 The first process requrired in the use of neural networks, is the conversion of raw text into a vector-base representation, giving a sentance as a set of vectors. The sentence is then passed into the neural network \cite{NeuralNetworks}. The network proposed by R.Collobert and J. Weston in 2008 contained multiple layers, each serving its own purpose \cite{NeuralNetworks}. Initially the network identifies word features, before using this data to calculate the probability of each synset of each word.
 
@@ -347,6 +351,161 @@ As mentioned previously, the values of some variables were found using experimen
 \end{itemize}
 
 Unfortunately, the model failed to produce the correct synset significantly more accurately than the author's baseline (selecting the most common synset) \cite{MattBurkePrevious}. As suggested in the report, this may be due to semantic links, which occur in the brain, not being available or utilsed by the model. Though, it may also be the case that the mathematical models used were inaccurate, with less linear functions being required.
+
+
+\section{Implementation}
+\label{sec:Implementation}
+The application was implemented using the Python programming language, chosen for the availability of the Natural Language Toolkit (NLTK) \cite{NLTK}. NLTK provides an interface for use with Wordnet and a number of useful corpura (collections of tagged raw text), to be used as test data.
+
+\subsection{Corpus Analysis}
+\label{sec:CorpusAnalysis}
+Using the corpus reader built into NLTK, an entire document can be analaysed as a series of hierachical lists \cite{NLTK}:
+
+\begin{itemize}
+	\item \textbf{Document}, is a list of paragraphs,
+	\item \textbf{Paragraphs}, each of which is a list of sentences,
+	\item \textbf{Sentences}, each of which is a list of words.
+\end{itemize}
+
+The analyser traverses each of these lists, through a series of loops, processing them a sentance at a time.
+
+\subsection{Memory Structures}
+\label{sec:ImplementedMemoryStructures}
+
+Both an STS and Episodic Buffer have been implemented, using python classes for each. Interactions between the two memory structures are handled by a Memory Controller.
+
+\subsubsection{STS}
+\label{sec:ImplementedSTS}
+
+The STS (Stm in psuedocode) can, in a simplified sense, be described as a list containing memory items. These memory items have been implemented in python as an object with two attributes, synset (immutable) and activation (mutable), based upon the contents of the STS in the working memory model. These memory items can be replaced, if a synset with greater activation appears. The process of synset replacement is handled by the swapLowestItem function shown in Listing \ref{lst:swapLowestItem}.
+
+\begin{lstlisting}[numbers=left, numberstyle=\small, caption={the swapLowestItem function}, captionpos=b, label={lst:swapLowestItem}]
+FUNCTION swapLowestItem(newItem):
+        IF Stm.size < self.maxStmSize THEN
+            Stm.add(newItem)
+            RETURN None
+        ELSE
+            self.lowestItem = self.getLowestActivation()
+            IF newItem.Activation < stm.lowestActivationItem THEN
+                RETURN None
+            ELSE
+                Stm.remove(lowestActivationItem)
+                Stm.add(newItem)
+                RETURN stm.lowestActivationItem
+            END IF
+        END IF
+END FUNCTION
+\end{lstlisting}
+
+A notable feature of the STS is its limited capacity, as described by G. Miller in 1955 \cite{SevenPlusMinusTwo}. It is for this reason that the ability to swap memory items is required. In the case that the STS isn't full, the new memory item is simply added with no swap taking place.
+
+\subsubsection{Episodic Buffer}
+\label{sec:ImplementedEpisodicBuffer}
+
+The purpose of the episodic buffer, is to maintain a list of synsets which have occurred in the STS previously. This allows future activations of synsets which have already occured to receive a boost when activated in the future. Interactions with the Episodic buffer only occcur during the activation of synsets, therefore, all interactions are handled by the Meory Controller.
+
+\subsubsection{Memory Controller}
+\label{sec:ImplementedMemoryController}
+
+A memory controller has been implemented to handle interactions between the STS and episodic buffer. The most notable of its uses is the activation of synsets. In order to activate a synset, the Memory Controller must take into account the whether the synset is present in any of the afformentioned memory structures, and handle the activation accordingly. The activateSynset function, shown in Listing \ref{lst:activateSynset} is responsible for handling this process.
+
+\begin{lstlisting}[numbers=left, numberstyle=\small, caption={the activateSynset function}, captionpos=b, label={lst:activateSynset}]
+FUNCTION activateSynset(self, synset, activationModifier):
+        IF stm.inContents(synset) THEN
+            synset.activate(activationModifier)
+            RETURN
+        ELSE IF episodicBuffer.inContents(synset) THEN
+            newMemItem = MemItem(synset, 1)
+            newMemItem.activate(activationModifier)
+            sendToStm(newMemItem)
+            RETURN
+        ELSE
+            newMemItem = MemItem(synset, 0)
+            newMemItem.activate(activationModifier)
+            sendToStm(newMemItem)
+            RETURN
+        END IF
+\end{lstlisting}
+
+If the activateSynset finds the synset in the STS, 
+
+ The most notable of its functions is sendToStm, shown in Listing \ref{lst:sendToStm}.
+
+\begin{lstlisting}[numbers=left, numberstyle=\small, caption={the sendToStm function}, captionpos=b, label={lst:sendToStm}]
+FUNCTION sendToStm(inputSynset):
+	episodicBuffer.remove(inputSynset)
+	returnedItem := stm.swapLowestItem(inputSynset)
+	episodicBuffer.add(returnedItem)
+END FUNCTION
+\end{lstlisting}
+
+The swapLowestItem function, shown in Listing \ref{lst:swapLowestItem}, will return either the item sent (i.e. the STS rejects the item) or the item in the STS with the lowest activation. Whichever is returned will be added into the Episodic Buffer.
+
+If the STS isn't full, the new item is simply added to the STS, and nothing is returned.
+
+Throughout the analysis of a corpus, the activation of a specific memory item can change by either being forgotten or activated.
+
+\subsection{Forgetting}
+\label{sec:forgetting}
+After each sentence is read, all items inthe STS must be forgotten (have their activation reduced), so as to comply with Atkinson and Shiffrin's STS model discussed \hyperref[ShortTerm]{previously} \cite{ControlProcessesSTMAtkinson}. The forgetting of the entire contents of the STS is done using a loop, as shown in Listing \ref{lst:ForgetLoop}
+
+\begin{lstlisting}[numbers=left, numberstyle=\small, caption={Forget loop}, captionpos=b, label={lst:ForgetLoop}]
+FOR item IN Stm LOOP
+	item.forget()
+END LOOP
+\end{lstlisting}
+
+\subsection{Activation}
+\label{sec:activation} 
+
+The corpus is read a sentence at a time, for each word in the sentence a series of activations takes place, according to the pseudo-code shown in Listing \ref{lst:HypernymActivation}.
+
+
+\begin{lstlisting}[numbers=left, numberstyle=\small, caption={Hypernym Activation}, captionpos=b, label={lst:HypernymActivation}]
+FUNCTION activateHypernyms(synset, depth, activationModifier):
+   activationModifier = hypernymModel(activationModifier)
+   IF activationModifier < 0 THEN
+       RETURN
+   END IF
+   activateSynset(synset, activationModifier)
+   IF depth > 0 THEN
+       FOR hypernym in synset.hypernyms() LOOP
+           linearHypernym(hypernym, depth - 1, activationModifier)
+       END LOOP
+   ELSE:
+       RETURN
+   END IF
+END FUNCTION
+\end{lstlisting}
+
+It can be seen that the function recursively activates the synsets of all hypernyms up to a specified depth. As the function traverses through each hypernym, the amount they are activated by decreases, favouring less general synsets.
+
+Upon activation, the synset in question's activation is increased according to the model:
+
+The same synset can be activated multiple times within the same sentence. In this case, a similar model to \hyperref[sec:MattBurke]{that proposed by M. Burke} \cite{MattBurkePrevious} is used: 
+\[H = \sum\limits_{i=1}^N S_i\] 
+The total acivation increase is equal to the sum of all synset activations within the sentence. 
+
+In Listing \ref{lst:HypernymActivation},there exists a function, hypernymModel. This function is responsible for reducing the activation increase of hypernyms as they become more general (closer to the top of the tree). This function should favour most heavily, less general hypernyms, i.e. those activated by the first few recursions of activateHypernyms. 
+
+\begin{figure}[h]
+\begin{tikzpicture}
+\begin{axis}[domain=0:10, grid=both, enlarge x limits=false]
+\addplot[color=red]{log2(x)};
+\end{axis}
+\end{tikzpicture}
+\caption{GRAPH OF $\log(x)$}
+\label{fig:logGraph}
+\end{figure}
+
+One function which fits this criteria is $\log(x)$, shown in Figure \ref{fig:logGraph}. The gradient of the function, for higher values of $x$ is relatively shallow, favouring more general hypernyms heavily. For lower values of $x$, the gradient becomes very steep, causing more general hypernyms to have a lower activation increase.
+
+It may be necessary to tune this function during experimentation, to provide greater accuracy, meaning more variables must be added. With these additions, the full model is:
+\[f(x) = a + b\log(x)\]
+where $a$ and $b$ are varied during experimentation, and $x$ is the 
+
+\subsection{Disambiguation}
+\label{sec:ImplementedDisambiguation}
 
 \newpage
 \bibliography{references}
