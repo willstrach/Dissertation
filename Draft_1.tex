@@ -29,7 +29,7 @@
         \vspace{0.8cm}
         
         \Large
-        Word Count - 3108\\
+        Word Count - 4102\\
         Supervisor - Dr Dimitar Kazakov\\
         Department of Computer Science\\
         University of York\\
@@ -427,27 +427,27 @@ FUNCTION activateSynset(self, synset, activationModifier):
         END IF
 \end{lstlisting}
 
-If the activateSynset finds the synset in the STS, 
-
- The most notable of its functions is sendToStm, shown in Listing \ref{lst:sendToStm}.
+If the activateSynset finds the synset in the STS, the synset is simply activated using, and remains there. If the synset is not present in the STS, it is activated, and sent to the STS, through the sendToStm function, shown in Listing \ref{lst:sendToStm}, recieving a boost if it has previously existed in the STS (i.e. it is in the Episodic Buffer).
 
 \begin{lstlisting}[numbers=left, numberstyle=\small, caption={the sendToStm function}, captionpos=b, label={lst:sendToStm}]
 FUNCTION sendToStm(inputSynset):
-	episodicBuffer.remove(inputSynset)
-	returnedItem := stm.swapLowestItem(inputSynset)
-	episodicBuffer.add(returnedItem)
+	returnedItem = self.stm.swapLowestItem(inputItem)
+    IF returnedItem is None THEN
+        RETURN
+    ELSE IF NOT episodicBuffer.inContents(returnedItem) THEN
+        episodicBuffer.addSynset(returnedItem)
+        RETURN
+    END IF
 END FUNCTION
 \end{lstlisting}
 
-The swapLowestItem function, shown in Listing \ref{lst:swapLowestItem}, will return either the item sent (i.e. the STS rejects the item) or the item in the STS with the lowest activation. Whichever is returned will be added into the Episodic Buffer.
-
-If the STS isn't full, the new item is simply added to the STS, and nothing is returned.
+The sendToStm function, shown in Listing \ref{lst:sendToStm}, is responsible for changing the contents of the STS and updating the Episodic buffer accordingly. The swapLowestItem function, shown in Listing \ref{lst:swapLowestItem} is used to edit the STS. As discussed \hyperref[sec:ImplementedSTS]{previously}, this function can return a synset, if the swap is successful. In this case, sendToStm will add the synset previously in the STS, to the episodic buffer (if it is not already present there).
 
 Throughout the analysis of a corpus, the activation of a specific memory item can change by either being forgotten or activated.
 
 \subsection{Forgetting}
 \label{sec:forgetting}
-After each sentence is read, all items inthe STS must be forgotten (have their activation reduced), so as to comply with Atkinson and Shiffrin's STS model discussed \hyperref[ShortTerm]{previously} \cite{ControlProcessesSTMAtkinson}. The forgetting of the entire contents of the STS is done using a loop, as shown in Listing \ref{lst:ForgetLoop}
+After each sentence is read, all items in the STS must be forgotten (have their activation reduced), so as to comply with Atkinson and Shiffrin's STS model discussed \hyperref[ShortTerm]{previously} \cite{ControlProcessesSTMAtkinson}. The forgetting of the entire contents of the STS is done using a loop, as shown in Listing \ref{lst:ForgetLoop}.
 
 \begin{lstlisting}[numbers=left, numberstyle=\small, caption={Forget loop}, captionpos=b, label={lst:ForgetLoop}]
 FOR item IN Stm LOOP
@@ -455,30 +455,28 @@ FOR item IN Stm LOOP
 END LOOP
 \end{lstlisting}
 
+The forgetting process occurs after every sentence, giving synsets in the next sentence the opportunity to enter the STS.
+
 \subsection{Activation}
 \label{sec:activation} 
 
 The corpus is read a sentence at a time, for each word in the sentence a series of activations takes place, according to the pseudo-code shown in Listing \ref{lst:HypernymActivation}.
 
-
 \begin{lstlisting}[numbers=left, numberstyle=\small, caption={Hypernym Activation}, captionpos=b, label={lst:HypernymActivation}]
-FUNCTION activateHypernyms(synset, depth, activationModifier):
-   activationModifier = hypernymModel(activationModifier)
+FUNCTION activateHypernyms(synset, depth):
+   activationModifier = hypernymModel(depth)
    IF activationModifier < 0 THEN
        RETURN
-   END IF
-   activateSynset(synset, activationModifier)
-   IF depth > 0 THEN
+   ELSE
        FOR hypernym in synset.hypernyms() LOOP
-           linearHypernym(hypernym, depth - 1, activationModifier)
+           activateHypernyms(hypernym, depth + 1)
        END LOOP
-   ELSE:
        RETURN
    END IF
 END FUNCTION
 \end{lstlisting}
 
-It can be seen that the function recursively activates the synsets of all hypernyms up to a specified depth. As the function traverses through each hypernym, the amount they are activated by decreases, favouring less general synsets.
+It can be seen that the function recursively activates the synsets of all hypernyms until, the model gives a result of less than zero. As the function traverses through each hypernym, the amount they are activated by decreases, favouring less general synsets.
 
 Upon activation, the synset in question's activation is increased according to the model:
 
@@ -491,21 +489,75 @@ In Listing \ref{lst:HypernymActivation},there exists a function, hypernymModel. 
 \begin{figure}[h]
 \begin{tikzpicture}
 \begin{axis}[domain=0:10, grid=both, enlarge x limits=false]
-\addplot[color=red]{log2(x)};
+\addplot[color=red]{-log2(x)};
 \end{axis}
 \end{tikzpicture}
-\caption{GRAPH OF $\log(x)$}
+\caption{GRAPH OF $-\log(x)$}
 \label{fig:logGraph}
 \end{figure}
 
-One function which fits this criteria is $\log(x)$, shown in Figure \ref{fig:logGraph}. The gradient of the function, for higher values of $x$ is relatively shallow, favouring more general hypernyms heavily. For lower values of $x$, the gradient becomes very steep, causing more general hypernyms to have a lower activation increase.
+One function which fits this criteria is $-\log(x)$, shown in Figure \ref{fig:logGraph}. The values given by the function, for higher values of $x$ are relatively high, favouring more general hypernyms heavily. For lower values of $x$, the values given are relatively low, causing more general hypernyms to have a lower activation increase.
 
 It may be necessary to tune this function during experimentation, to provide greater accuracy, meaning more variables must be added. With these additions, the full model is:
-\[f(x) = a + b\log(x)\]
-where $a$ and $b$ are varied during experimentation, and $x$ is the 
+\[f(x) = -b\log(ax)\]
+where $a$ and $b$ are varied during experimentation, and $x$ is the depth of the hypernym. When the depth = 0 (i.e. the activation of the root synset) the model would require the calculation of log(0), which is undefined. For this reason, an offset of 0.001 was added, making the final model:
+\[f(x) = -b\log(ax+0.001)\]
+The size of the offset needed to be small to reduce its impact on the overall model.
 
 \subsection{Disambiguation}
 \label{sec:ImplementedDisambiguation}
+Up to this point, we have only discussed the processes involved with changing the contents of the memory structures. The purpose of these memory structures is to provide the surrounding context of a word, to aid in its disambiguation. 
+
+As discussed in the \hyperref[sec:DisambiguationModels]{Disambiguation Models section}, the multiple access model relies upon context and frequency, using whichever is stronger for disambiguation \cite{PsychologyOfLanguage}. The system discussed in this section makes use of both of these, through the disambiguate function, shown in Listing \ref{lst:disambiguate}.
+
+\begin{lstlisting}[numbers=left, numberstyle=\small, caption={The disambiguate function}, captionpos=b, label={lst:disambiguate}]
+FUNCTION disambiguate(synsetList):
+    FOR item in stm LOOP
+        IF item in synsetList THEN
+            RETURN item
+        END IF
+    END LOOP
+    FOR item in stm LOOP
+        returnedSynset = hyponymSearch(synsetList, item)
+        IF returnedSynset is not None THEN
+            RETURN returnedSynset
+        END IF
+    END LOOP
+    RETURN mostLikelySynset(synsetList)
+END FUNCTION
+\end{lstlisting}
+
+\subsubsection{Context}
+\label{sec:DisambiguationContext}
+The context required for disambiguation exists in the STS. Initially, the disambiguate function traverses through the STS, searching for a synset of the word to be disambiguated. If successful, the function will return the found synset. If unsuccessful, more investigation is required, through the use of hyponyms.
+
+As discussed in the \hyperref[sec:MattBurke]{Previous Works section}, M. Burke found that hyponym based searching, using the Stm is the most effective method of disambiguation \cite{MattBurkePrevious}. This method works upon the assumption that the contents of the Stm are relatively general (i.e. exist high up in the Wordnet hierarchy). The implementation of this search is given by the hyponymSearch function, shown in Listing \ref{lst:hyponymSearch}.
+
+\begin{lstlisting}[numbers=left, numberstyle=\small, caption={The hyponymSearch function}, captionpos=b, label={lst:hyponymSearch}]
+FUNCTION hyponymSearch(synsetList, searchItem):
+    hyponymList = searchItem.hyponyms()
+    IF len(hyponymList) == 0 THEN
+        RETURN None
+    END IF
+    FOR item in hyponymList LOOP
+        IF item in synsetList THEN
+            RETURN item
+        END IF
+    END LOOP
+    FOR item in hyponymList LOOP
+        returnedItem = hyponymSearch(synsetList, item)
+        IF returnedItem is not None THEN
+            RETURN returnedItem
+        END IF
+    END LOOP
+    RETURN None
+\end{lstlisting}
+
+
+
+\subsubsection{Frequency}
+\label{sec:DisambiguationFrequency}
+
 
 \newpage
 \bibliography{references}
