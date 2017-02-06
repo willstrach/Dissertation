@@ -29,7 +29,7 @@
         \vspace{0.8cm}
         
         \Large
-        Word Count - 4102\\
+        Word Count - 4507\\
         Supervisor - Dr Dimitar Kazakov\\
         Department of Computer Science\\
         University of York\\
@@ -326,7 +326,7 @@ The author noted that, highly activated synsets could remain in the short-term m
 In the proposed model, the corpus is processed sentence by sentence. Two methods of disambiguation were proposed, with both cases beginning by removing non-useful words, and converting all words into their base forms (e.g. "flies" $\Rightarrow$ "fly"), each model differs in its use of the contents of the short term memory.
 \begin{itemize}
 	\item[] \textbf{Hypernym-first - } The hypernyms of all words are activated, with the synsets with the highest activation bieng used to disambguate each word \cite{MattBurkePrevious}.
-	\item[] \textbf{STM-first - } The item in the Short term memory with the highest activation's hyponyms are searched until one of the synsets present in the sentence are found \cite{MattBurkePrevious}.
+	\item[] \textbf{STM-first - } The contents of the Short term memory's hyponyms are searched until one of the synsets present in the sentence are found \cite{MattBurkePrevious}.
 \end{itemize}
 
 
@@ -531,7 +531,7 @@ END FUNCTION
 \label{sec:DisambiguationContext}
 The context required for disambiguation exists in the STS. Initially, the disambiguate function traverses through the STS, searching for a synset of the word to be disambiguated. If successful, the function will return the found synset. If unsuccessful, more investigation is required, through the use of hyponyms.
 
-As discussed in the \hyperref[sec:MattBurke]{Previous Works section}, M. Burke found that hyponym based searching, using the Stm is the most effective method of disambiguation \cite{MattBurkePrevious}. This method works upon the assumption that the contents of the Stm are relatively general (i.e. exist high up in the Wordnet hierarchy). The implementation of this search is given by the hyponymSearch function, shown in Listing \ref{lst:hyponymSearch}.
+As discussed in the \hyperref[sec:MattBurke]{Previous Works section}, M. Burke found that hyponym based searching (previously called STM-First), using the Stm is the most effective method of disambiguation \cite{MattBurkePrevious}. This method works upon the assumption that the contents of the Stm are relatively general (i.e. exist high up in the Wordnet hierarchy). The implementation of this search is given by the hyponymSearch function, shown in Listing \ref{lst:hyponymSearch}.
 
 \begin{lstlisting}[numbers=left, numberstyle=\small, caption={The hyponymSearch function}, captionpos=b, label={lst:hyponymSearch}]
 FUNCTION hyponymSearch(synsetList, searchItem):
@@ -553,11 +553,35 @@ FUNCTION hyponymSearch(synsetList, searchItem):
     RETURN None
 \end{lstlisting}
 
-
+This function traverses through all hyponyms of a given synset (searchItem) until either, a match with a synset in the synsetList is found, or the function reaches the base of the tree. If a match is found, the matched synset is returned as the correct word meaning. A meaning will only be found if the surrounding context of a word gives enough indication of its meaning, that is, to comply with the multiple access model, where if strong context exists, it is used for disambiguation \cite{PsychologyOfLanguage}.
 
 \subsubsection{Frequency}
 \label{sec:DisambiguationFrequency}
+The previously described hyponym-based system will only find a meaning if a word's surrounding context is strong. When this is not the case, another system must be used. The multiple access model, described in the \hyperref[sec:DisambiguationModels]{Disambiguation Models section}, states that in such cases, the likelihood of a proposed word meaning is used \cite{PsychologyOfLanguage}.
 
+In order to calculate the likelihood of each synset in the synsetList, Wordnet's lemmas are used. Lemmas in Wordnet are the word forms a synset can take. For each lemma, there exists a frequency value, which describes how common that form is, relative to other Wordnet lemmas. For each synset, the sum of all its lemmas' frequency values, is used to calculate the most likely synset, as shown in Listing \ref{lst:synsetFrequency}.
+
+\begin{lstlisting}[numbers=left, numberstyle=\small, caption={The synsetFrequency and mostLikelySynset functions}, captionpos=b, label={lst:synsetFrequency}]
+FUNCTION synsetFrequency(synset):
+    outputFrequency = 0
+    FOR lemma in synset.lemmas() LOOP
+        outputFrequency += lemma.count()
+    END LOOP
+    RETURN outputFrequency
+END FUNCTION
+
+FUNCTION mostLikelySynset(synsetList):
+    outputSynset = synsetList[0]
+    FOR synset in synsetList LOOP
+        IF synsetFrequency(outputSynset) < synsetFrequency(synset) THEN
+            outputSynset = synset
+        END IF
+    END LOOP
+    RETURN outputSynset
+END FUNCTION
+\end{lstlisting}
+
+As stated previously, in cases where context cannot provide a viable synset, the above are used for disambiguation.
 
 \newpage
 \bibliography{references}
