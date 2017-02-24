@@ -6,6 +6,8 @@
 \usepackage{listings}
 \usepackage{pgfplots}
 \usepackage{tcolorbox}
+\usepackage{tikz}
+\usepackage{tikz-qtree}
 
 \graphicspath{ {images/} }
 \setlength{\parskip}{0.5em}
@@ -132,6 +134,7 @@ Within the Explicit memory exists knowledge of semantics \cite{MemoryBaddeleyEys
 The short-term store (STS) is a structure of limited capacity, used to store items for periods usually of no more than a few seconds \cite{MemoryBaddeleyEysenkAnderson}. In 1955, G. Miller, based upon previous experimental results, concluded that the size of the STS existed in the realm of 7$\pm$2 items of information \cite{SevenPlusMinusTwo}. 
 
 In 1971, R. Atkinson and R. Shiffrin proposed a model of the STS \cite{ControlProcessesSTMAtkinson}. In this model, the STS can both send information to, and draw information from the LTS. Inputs from the sensory registers (memory structures holding information relating to inputs from senses) are also sent to the STS. Atkinson and Shiffrin proposed that, over time, the activation of items in the STS decreased; they went on to theorise that items could be lost from the STS, only when a new, more highly activated item could take its place. To counter this loss of activation, the authors discussed the control process, rehearsal. This process makes use of repetition to increase the activation of items in memory, decreasing their chance of loss. 
+
 
 \subsubsection{Disambiguation Models}
 \label{sec:DisambiguationModels}
@@ -362,17 +365,76 @@ The application was implemented using the Python programming language, chosen fo
 Using the corpus reader built into NLTK, an entire document can be analaysed as a series of hierachical lists \cite{NLTK}:
 
 \begin{itemize}
-	\item \textbf{Document}, is a list of paragraphs,
-	\item \textbf{Paragraphs}, each of which is a list of sentences,
+	\item \textbf{Document}, is a list of sentences,
 	\item \textbf{Sentences}, each of which is a list of words.
 \end{itemize}
 
 The analyser traverses each of these lists, through a series of loops, processing them a sentance at a time.
 
+\subsection{Activation}
+\label{sec:activation} 
+
+The corpus is read a sentence at a time, for each word in the sentence a series of activations takes place. Initially, the synsets of each word are activated, followed by their hypernyms following the algorithm outlined in Listing \ref{lst:HypernymActivation}.
+
+\begin{lstlisting}[numbers=left, numberstyle=\small, caption={Hypernym Activation}, captionpos=b, label={lst:HypernymActivation}]
+FUNCTION activateHypernyms(synset, depth):
+   activationModifier = hypernymModel(depth)
+   IF activationModifier < 0 THEN
+       RETURN
+   ELSE
+       FOR hypernym in synset.hypernyms() LOOP
+           activateHypernyms(hypernym, depth + 1)
+       END LOOP
+       RETURN
+   END IF
+END FUNCTION
+\end{lstlisting}
+
+The function recursively traverses the tree of hypernyms an example of which is shown in Figure \ref{fig:hypernymTree}, activating each synset until, the model gives a result of less than zero. As the function traverses through each hypernym, the amount they are activated by decreases, favouring less general synsets.
+
+\begin{figure}[h]
+\begin{tikzpicture}[grow=right, sibling distance=5pt, level distance=100pt]
+\Tree [.dreams [.dream.n.01 [.imagination.n.02 representational{\_}process.n.01 ] ] [.dream.n.02 [.imagination.n.01 creativity.n.01 ] ] [.ambition.n.01 [.desire.n.01 feeling.n.01 ] ] [.pipe{\_}dream.n.01 [.fantasy.n.01 imagination.n.01 ] ] [.dream.n.05 [.reverie.n.02 abstractedness.n.01 ] ] [.dream.n.06 [.perfection.n.01 state.n.02 ] ] [.dream.v.01 [.imagine.v.01 create{\_}by{\_}mental{\_}act.v.01 ] ] [.dream.v.02 [.perceive.v.01 ] ] ]
+\end{tikzpicture}
+\caption{HYPERNYM TREE OF "DREAMS"}
+\label{fig:hypernymTree}
+\end{figure}
+
+\begin{figure}[h]
+	\includegraphics[scale=0.6]{HypernymActivation.png}
+	\caption{HYPERNYM ACTIVATION}
+	\label{fig:HypernymAct}
+\end{figure}
+
+Upon activation, the synset in question's activation is increased by an amount, dependant upon the hypernym model used (discussed later in this section). The same synset can be activated multiple times within the same sentence, an example of which is shown in Figure \ref{fig:HypernymAct}. In this case, a similar model to \hyperref[sec:MattBurke]{that proposed by M. Burke} \cite{MattBurkePrevious} is used: 
+\[H = \sum\limits_{i=1}^N S_i\] 
+The total acivation increase is equal to the sum of all synset activations within the sentence. 
+
+It can be seen that, in Listing \ref{lst:HypernymActivation},there exists a function, hypernymModel. This function is responsible for reducing the activation increase of hypernyms as they become more general (closer to the top of the tree). This function should favour most heavily, less general hypernyms, i.e. those activated by the first few recursions of activateHypernyms. 
+
+\begin{figure}[h]
+\begin{tikzpicture}
+\begin{axis}[domain=0:10, grid=both, enlarge x limits=false]
+\addplot[color=red]{-log2(x)};
+\end{axis}
+\end{tikzpicture}
+\caption{GRAPH OF $-\log(x)$}
+\label{fig:logGraph}
+\end{figure}
+
+One function which fits this criteria is $-\log(x)$, shown in Figure \ref{fig:logGraph}. The values given by the function, for higher values of $x$ are relatively high, favouring more general hypernyms heavily. For lower values of $x$, the values given are relatively low, causing more general hypernyms to have a lower activation increase.
+
+It may be necessary to tune this function during experimentation, to provide greater accuracy, meaning more variables must be added. With these additions, the full model is:
+\[f(x) = -b\log(ax)\]
+where $a$ and $b$ are varied during experimentation, and $x$ is the depth of the hypernym. When the depth = 0 (i.e. the activation of the root synset) the model would require the calculation of log(0), which is undefined. For this reason, an offset of 0.001 was added, making the final model:
+\[f(x) = -b\log(ax+0.001)\]
+The size of the offset needed to be small to reduce its impact on the overall model.
+
+
 \subsection{Memory Structures}
 \label{sec:ImplementedMemoryStructures}
 
-Both an STS and Episodic Buffer have been implemented, using python classes for each. Interactions between the two memory structures are handled by a Memory Controller.
+Upon activation, the synset in question may enter the memory structures, if it posesses a high enough activation. Both an STS and Episodic Buffer have been implemented, using python classes for each. Interactions between the two memory structures are handled by a Memory Controller. As discussed in the \hyperref[Wordnet]{WordNet section}, WordNet provides a good model of the semantic memory \cite{WN1Introduction},described in the \hyperref[LongTerm]{Long-term Store section}. For this reason it has been used heavily.
 
 \subsubsection{STS}
 \label{sec:ImplementedSTS}
@@ -402,7 +464,14 @@ A notable feature of the STS is its limited capacity, as described by G. Miller 
 \subsubsection{Episodic Buffer}
 \label{sec:ImplementedEpisodicBuffer}
 
-The purpose of the episodic buffer, is to maintain a list of synsets which have occurred in the STS previously. This allows future activations of synsets which have already occured to receive a boost when activated in the future. Interactions with the Episodic buffer only occcur during the activation of synsets, therefore, all interactions are handled by the Meory Controller.
+The purpose of the episodic buffer, is to maintain a list of synsets which have occurred in the STS previously. This allows future activations of synsets which have already occured to receive a boost when activated in the future. Interactions with the Episodic buffer only occcur during the activation of synsets, therefore, all interactions are handled by the Memory Controller.
+
+\subsubsection{Semantic Memory}
+\label{sec:ImplementedSemanticMemory}
+
+The Semantic Memory is responsible for maintaining all the semantic knowledge of the system. It was decided that WordNet provided the best solution, with its in depth knowledge of synsets and their relations to eachother \cite{WN2Nouns, WN4Verbs}.
+
+NLTK's built in WordNet reader \cite{NLTK} was used to interact with WordNet. Throughout the system, synsets are used. Each of these is a reference to a synset present in WordNet, allowing their semantic relationships (accessed through their methods) to be used. 
 
 \subsubsection{Memory Controller}
 \label{sec:ImplementedMemoryController}
@@ -457,56 +526,11 @@ END LOOP
 
 The forgetting process occurs after every sentence, giving synsets in the next sentence the opportunity to enter the STS.
 
-\subsection{Activation}
-\label{sec:activation} 
-
-The corpus is read a sentence at a time, for each word in the sentence a series of activations takes place, according to the pseudo-code shown in Listing \ref{lst:HypernymActivation}.
-
-\begin{lstlisting}[numbers=left, numberstyle=\small, caption={Hypernym Activation}, captionpos=b, label={lst:HypernymActivation}]
-FUNCTION activateHypernyms(synset, depth):
-   activationModifier = hypernymModel(depth)
-   IF activationModifier < 0 THEN
-       RETURN
-   ELSE
-       FOR hypernym in synset.hypernyms() LOOP
-           activateHypernyms(hypernym, depth + 1)
-       END LOOP
-       RETURN
-   END IF
-END FUNCTION
-\end{lstlisting}
-
-It can be seen that the function recursively activates the synsets of all hypernyms until, the model gives a result of less than zero. As the function traverses through each hypernym, the amount they are activated by decreases, favouring less general synsets.
-
-Upon activation, the synset in question's activation is increased according to the model:
-
-The same synset can be activated multiple times within the same sentence. In this case, a similar model to \hyperref[sec:MattBurke]{that proposed by M. Burke} \cite{MattBurkePrevious} is used: 
-\[H = \sum\limits_{i=1}^N S_i\] 
-The total acivation increase is equal to the sum of all synset activations within the sentence. 
-
-In Listing \ref{lst:HypernymActivation},there exists a function, hypernymModel. This function is responsible for reducing the activation increase of hypernyms as they become more general (closer to the top of the tree). This function should favour most heavily, less general hypernyms, i.e. those activated by the first few recursions of activateHypernyms. 
-
-\begin{figure}[h]
-\begin{tikzpicture}
-\begin{axis}[domain=0:10, grid=both, enlarge x limits=false]
-\addplot[color=red]{-log2(x)};
-\end{axis}
-\end{tikzpicture}
-\caption{GRAPH OF $-\log(x)$}
-\label{fig:logGraph}
-\end{figure}
-
-One function which fits this criteria is $-\log(x)$, shown in Figure \ref{fig:logGraph}. The values given by the function, for higher values of $x$ are relatively high, favouring more general hypernyms heavily. For lower values of $x$, the values given are relatively low, causing more general hypernyms to have a lower activation increase.
-
-It may be necessary to tune this function during experimentation, to provide greater accuracy, meaning more variables must be added. With these additions, the full model is:
-\[f(x) = -b\log(ax)\]
-where $a$ and $b$ are varied during experimentation, and $x$ is the depth of the hypernym. When the depth = 0 (i.e. the activation of the root synset) the model would require the calculation of log(0), which is undefined. For this reason, an offset of 0.001 was added, making the final model:
-\[f(x) = -b\log(ax+0.001)\]
-The size of the offset needed to be small to reduce its impact on the overall model.
+When a synset is forgotten, its activation may fall below a threshold, varied in experimentation. If this occurs, the synset is removed from the STS and, as with the sendToStm function, is added to the Episodic Buffer. This prevents synsets irrelevant to the current context from existing in the STS.
 
 \subsection{Disambiguation}
 \label{sec:ImplementedDisambiguation}
-Up to this point, we have only discussed the processes involved with changing the contents of the memory structures. The purpose of these memory structures is to provide the surrounding context of a word, to aid in its disambiguation. 
+Up to this point, we have only discussed the processes involved with changing the contents of the memory structures. The purpose of these memory structures is to provide the surrounding context of a word, to aid in its disambiguation. There exists a delay between the processes described previously (i.e. the initial reading of the sentence) and the disambiguation phase. This delay allows inappropriate synsets to leave the STS before they are used. The duration of this delay is to be adjusted during experimentation.
 
 As discussed in the \hyperref[sec:DisambiguationModels]{Disambiguation Models section}, the multiple access model relies upon context and frequency, using whichever is stronger for disambiguation \cite{PsychologyOfLanguage}. The system discussed in this section makes use of both of these, through the disambiguate function, shown in Listing \ref{lst:disambiguate}.
 
@@ -529,7 +553,7 @@ END FUNCTION
 
 \subsubsection{Context}
 \label{sec:DisambiguationContext}
-The context required for disambiguation exists in the STS. Initially, the disambiguate function traverses through the STS, searching for a synset of the word to be disambiguated. If successful, the function will return the found synset. If unsuccessful, more investigation is required, through the use of hyponyms.
+The context required for disambiguation exists in the STS. Two algorithms for disambiguation using this context have been implemented, one using hyponyms and one using hypernyms.
 
 As discussed in the \hyperref[sec:MattBurke]{Previous Works section}, M. Burke found that hyponym based searching (previously called STM-First), using the Stm is the most effective method of disambiguation \cite{MattBurkePrevious}. This method works upon the assumption that the contents of the Stm are relatively general (i.e. exist high up in the Wordnet hierarchy). The implementation of this search is given by the hyponymSearch function, shown in Listing \ref{lst:hyponymSearch}.
 
@@ -553,7 +577,21 @@ FUNCTION hyponymSearch(synsetList, searchItem):
     RETURN None
 \end{lstlisting}
 
-This function traverses through all hyponyms of a given synset (searchItem) until either, a match with a synset in the synsetList is found, or the function reaches the base of the tree. If a match is found, the matched synset is returned as the correct word meaning. A meaning will only be found if the surrounding context of a word gives enough indication of its meaning, that is, to comply with the multiple access model, where if strong context exists, it is used for disambiguation \cite{PsychologyOfLanguage}.
+This function traverses through all hyponyms of a given synset (searchItem) until either, a match with a synset in the synsetList is found, or the function reaches the base of the tree. If a match is found, the matched synset is returned as the correct word meaning.
+
+Another algorithm, shown in Listing \ref{lst:hypernymSearch}, for disambiguation has also been implemented, using the lowest{\_}common{\_}hypernym method implemented in NLTK's WordNet reader \cite{NLTK}. This algorithm instead searches the hypernyms of both the word to disambiguate and the item in the STS, to find whether a common hypernym exists. If a common hypernym does exist, it is checked to ensure it is not too general (e.g. the common hypernym could be "entity" which is a hypernym of all nouns), and the synset is returned as the correct meaning.
+
+\begin{lstlisting}[numbers=left, numberstyle=\small, caption={THE HYPERNYMSEARCH FUNCTION}, captionpos=b, label={lst:hypernymSearch}]
+FUNCTION hypernymSearch(synsetList, searchItem):
+    FOR synset in synsetList LOOP
+        common_hypernym = synset.lowest_common_hypernym(searchItem)
+        IF common_hypernym.depth > 4 THEN
+            RETURN synset
+       	END IF
+   	END LOOP
+\end{lstlisting}  
+
+Using either method, a meaning will only be found if the surrounding context of a word gives enough indication of its meaning, complying with the multiple access model, where if strong context exists, it is used for disambiguation \cite{PsychologyOfLanguage}.
 
 \subsubsection{Frequency}
 \label{sec:DisambiguationFrequency}
@@ -581,7 +619,8 @@ FUNCTION mostLikelySynset(synsetList):
 END FUNCTION
 \end{lstlisting}
 
-As stated previously, in cases where context cannot provide a viable synset, the above are used for disambiguation.
+As stated previously, in cases where context cannot provide a viable synset, the above is used for disambiguation.
+
 
 \newpage
 \bibliography{references}
