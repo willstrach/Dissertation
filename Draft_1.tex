@@ -553,7 +553,9 @@ END FUNCTION
 
 \subsubsection{Context}
 \label{sec:DisambiguationContext}
-The context required for disambiguation exists in the STS. Two algorithms for disambiguation using this context have been implemented, one using hyponyms and one using hypernyms.
+The context used for disambiguation its taken from two sources, the STS and knowledge of noun-verb relationships (the latter is discussed in the \hyperref[Sanity]{Sanity Checking Section}).
+
+Initially, the context contained in the STS is used. Two algorithms for disambiguation using this context have been implemented, one using hyponyms and one using hypernyms.
 
 As discussed in the \hyperref[sec:MattBurke]{Previous Works section}, M. Burke found that hyponym based searching (previously called STM-First), using the Stm is the most effective method of disambiguation \cite{MattBurkePrevious}. This method works upon the assumption that the contents of the Stm are relatively general (i.e. exist high up in the Wordnet hierarchy). The implementation of this search is given by the hyponymSearch function, shown in Listing \ref{lst:hyponymSearch}.
 
@@ -620,6 +622,66 @@ END FUNCTION
 \end{lstlisting}
 
 As stated previously, in cases where context cannot provide a viable synset, the above is used for disambiguation.
+
+\subsubsection{Sanity Checking}
+\label{Sanity}
+Given the sentence:
+\[He\: fixed\: the\: bug\]
+The reader knows that "bug" refers to a computer bug, due to its use with the verb "fixed". So far, the system has no way of modelling the contextual effects of nouns on verbs, so the system is likely to produce invalid sentences. For this reason, post-disambiguation sanity checks occur.
+
+Though a proposed feature, WordNet does not currently contain relationships between nouns and verbs \cite{WN4Verbs}. For this reason, the information had to be extracted from the available corpus. It was decided that half of the test corpus would be used for the extraction, so that test data used for evaluation would be completely new to the system.
+
+Listing \ref{lst:verbDistance} shows the algorithm used for extracting this information. Nouns which occur in the same sentence as a specific Verb are considered valid partners to the Verb, and are added to a dictionary for quick lookup.
+
+\begin{lstlisting}[numbers=left, numberstyle=\small, caption={The noun-verb relationship learning algorithm}, captionpos=b, label={lst:verbDistance}]
+FUNCTION verbDistance(verb, sentence):
+	FOR word in sentence LOOP
+		IF word is a noun THEN
+			outputList.append(word.synset)
+		END IF
+	END LOOP
+	RETURN outputList
+END FUNCTION			
+
+FOR sentence in inputCorpus LOOP
+	FOR every verb in sentence LOOP
+		update contents of verbDict[verb.synset] 
+		to include verbDistance(verb, sentence)
+	END LOOP
+END LOOP
+\end{lstlisting}
+
+Initially, the sentence is disambiguated, using the method described \hyperref[sec:ImplementedDisambiguation]{previously}. The outputted sentence is then checked for correctness by the function sanityCheck, as shown in Listing \ref{lst:sanityCheck}. If a synset is found to be incompatible with others in the sentence, it is added to a blacklist, and its corresponding word is disambiguated again, ignoring the previous meaning.
+
+\begin{lstlisting}[numbers=left, numberstyle=\small, caption={The sanityCheck function}, captionpos=b, label={lst:sanityCheck}]
+FUNCTION sanityCheck(inputSentence, nounDict, verbDict):
+    sane = False
+    FOR word in inputSentence LOOP
+        IF word is a noun THEN
+            nounList.append(word)
+        ELSE IF word is a verb THEN
+            verbList.append(word)
+        END IF
+    END LOOP
+    WHILE not sane LOOP
+        sane = True
+        FOR verb in verbList LOOP
+            IF verb in verbDict THEN
+                plausibleNouns =  verbDict[verb]
+                IF nounList and plausibleNouns share common words THEN
+                    verbList.remove(verb)
+                ELSE
+                    blackList.append(verb)
+                    verbList.remove(verb)
+                    Run disambiguation again with blacklist
+                END IF
+            END  IF
+		END LOOP
+	END LOOP
+END FUNCTION
+\end{lstlisting}
+
+It may be noted that sanityCheck only considers verb incorrectness. As stated in the \hyperref[Verbs]{WordNet section}, for each word, there is likely to be a larger set of synsets when compared to nouns. With this knowledge, we can assume that the likelyhood of an incorrect result for a verb is higher than that of a noun. 
 
 
 \newpage
