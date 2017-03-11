@@ -45,6 +45,9 @@
 \newpage
 % ------------------------------ START OF DISSERTATION ------------------------------
 
+\section{Introduction}
+\label{sec:Intro}
+
 \section{Literature Review}
 \label{sec:LitReview}
 In order to define a problem, we must first establish the previous works, so as to build upon them effectively. 
@@ -356,7 +359,36 @@ As mentioned previously, the values of some variables were found using experimen
 Unfortunately, the model failed to produce the correct synset significantly more accurately than the author's baseline (selecting the most common synset) \cite{MattBurkePrevious}. As suggested in the report, this may be due to semantic links, which occur in the brain, not being available or utilsed by the model. Though, it may also be the case that the mathematical models used were inaccurate, with less linear functions being required.
 
 
-\section{Implementation}
+
+
+
+
+
+
+\section{Problem Analysis}
+\label{sec:ProbAnalysis}
+Semantic analysis is the process of extracting meaning from a sentence's tokens. Each individual token in a sentence has potentially many possible meanings; an effective tool should select the correct meaning, based upon each word's surrounding context. Throughout the \hyperref[sec:PrevWork]{previous work section} of the Literature Review, it is clear that Semantic Analysis is a problem which remains unsolved. 
+
+Previously, \hyperref[sec:LSA]{statistical methods} have been used to solve this problem. These methods 
+
+It is well known that the human brain's process of semantic analysis, is very effective. 
+
+Given the following sentence:
+
+\[The\: party\: led\: government.\]
+
+the reader knows that "party"refers to a political party, likely, as discussed in the \hyperref[sec:DisambiguationModels]{Disambiguation Models section}, due to its pairing with the word "government".  
+
+
+
+
+
+
+
+
+
+
+\section{Design and Implementation}
 \label{sec:Implementation}
 The application was implemented using the Python programming language, chosen for the availability of the Natural Language Toolkit (NLTK) \cite{NLTK}. NLTK provides an interface for use with Wordnet and a number of useful corpura (collections of tagged raw text), to be used as test data.
 
@@ -683,6 +715,13 @@ END FUNCTION
 
 It may be noted that sanityCheck only considers verb incorrectness. As stated in the \hyperref[Verbs]{WordNet section}, for each word, there is likely to be a larger set of synsets when compared to nouns. With this knowledge, we can assume that the likelyhood of an incorrect result for a verb is higher than that of a noun. 
 
+
+
+\section{Results and Evaluation}
+\label{sec:Results}
+
+\section{Conclusions}
+\label{sec:Conclusions}
 
 \newpage
 \bibliography{references}
