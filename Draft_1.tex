@@ -168,7 +168,7 @@ Wordnet builds upon models of the semantic memory, such as that discussed in the
 		\item Conceptually, Atonymy can be seen as the opposite of Synonymy. Atonymy is difficult to define, as not all words which share opposite meaning can be called atonyms, for example, \{up, down\} is an atonym pair, but \{up, fall\} is not.
 	\end{itemize}
 	
-	\item Hyponymy
+	\item Hyponymy \label{Hypernym}
 	\begin{itemize}
 		\item If we consider a a synset to be a object-oriented class, its hypernym can be considered its parent class, for example, birch is a type of tree.
 	\end{itemize}
@@ -299,7 +299,7 @@ In 1997, T. Laundaur and S. Dumais proposed a purely statistical method of seman
 
 When training the model, words which exist in the same context (i.e sentence, paragraph) are linked by a distance derived from their distance in the text. This distance is then adjsted according to similar occurences in more training data. Given enough training data, the distances between each node can be used to give the most likely synonyms of a word, given the context \cite{LatentSemanticAnalysis}.
 
-The authors found that, when presented with a synonym test, the model's best performance gave 64.4\% correct answers , which, when compared to US undergraduates for whom English is not their first language (scoring 64.5\% on average), could be considered to be reasonably effective \cite{LatentSemanticAnalysis}. This model only considers likelyhood, which, as discussed in the \hyperref[sec:DisambiguationModels]{fDisambiguation Models section}, is only one of the two methods the brain is theorised to use for this process. By using a similar method in conjunction with a context focused model, a more accurate and useful model could be produced.
+The authors found that, when presented with a synonym test, the model's best performance gave 64.4\% correct answers , which, when compared to US undergraduates for whom English is not their first language (scoring 64.5\% on average), could be considered to be reasonably effective \cite{LatentSemanticAnalysis}. This model only considers likelyhood, which, as discussed in the \hyperref[sec:DisambiguationModels]{Disambiguation Models section}, is only one of the two methods the brain is theorised to use for this process. By using a similar method in conjunction with a context focused model, a more accurate and useful model could be produced.
 
 \subsubsection{Extended TF-IDF}
 \label{sec:TFIDF}
@@ -367,18 +367,52 @@ Unfortunately, the model failed to produce the correct synset significantly more
 
 \section{Problem Analysis}
 \label{sec:ProbAnalysis}
+
+\subsection{Problem Definition}
+\label{sec:ProbDef}
 Semantic analysis is the process of extracting meaning from a sentence's tokens. Each individual token in a sentence has potentially many possible meanings; an effective tool should select the correct meaning, based upon each word's surrounding context. Throughout the \hyperref[sec:PrevWork]{previous work section} of the Literature Review, it is clear that Semantic Analysis is a problem which remains unsolved. 
 
-Previously, \hyperref[sec:LSA]{statistical methods} have been used to solve this problem. These methods 
+Semantic analysis has many applications, these include:
+\begin{itemize}
+	\item \textbf{Voice Recognition} has, over recent years, become an increasingly useful feature in consumer electronics. Conceptually, it can be seen that a system's ability to respond to voice input would be improved by a better semantic analysis.
+	
+	\item \textbf{The Summarisation of Documents} is a problem that has been partially solved by \hyperref[sec:TFIDF]{TF-IDF}. The summarisation could be improved by the aquisition of information regading text meaning.
+	 
+	\item \textbf{The Aquisition of Information for knowledge based systems} could occur automatically,using an effective semantic analysis system in conjunction with a large corpura.
+\end{itemize}
+This problem can be seen to be exceptionally relevant to current technologies, making it a worthy subject of this research.
 
-It is well known that the human brain's process of semantic analysis, is very effective. 
+Previously, \hyperref[sec:LSA]{statistical methods} have been used to solve this problem. These methods, as stated \hyperref[sec:LSA]{previously} only consider frequency in their definition, and so are limited in their ability to handle corpura where a single word can occur multiple times throughout, with differing definitions accross these instances.
 
-Given the following sentence:
+It is well known that the human brain's process of semantic analysis, is very effective. The brain's disambiguation process most likely uses the \hyperref[LongTerm]{memory structures proposed by Baddeley}\cite{MemoryBaddeleyEysenkAnderson}, containing information about relationships between word meanings. For example, given the following sentence:
 
 \[The\: party\: led\: government.\]
 
-the reader knows that "party"refers to a political party, likely, as discussed in the \hyperref[sec:DisambiguationModels]{Disambiguation Models section}, due to its pairing with the word "government".  
+the reader knows that "party"refers to a political party, likely, as discussed in the \hyperref[sec:DisambiguationModels]{Disambiguation Models section}, due to its pairing with the word "government".
 
+Previous attempts at the problem of semantic analysis, don't necessarily correlate with our knowledge of the human brain. Given this knowledge, it could be possible to produce an equivalent computational model, which may be more effective than purely statistical methods. For this reason, this project will attempt to make use of a model of the brain's disambiguation processes to build a system, capable of semantic analysis.
+
+\subsection{Project Aims}
+\label{sec:ProjectAim}
+The overall aim of this project is to build a system capable of finding the correct definitions of each word in a corpus. This problem is divisible into a set of smaller problems. 
+
+\begin{itemize}
+	\item \textbf{A computational model of memory structures} \newline
+		This model must based upon the memory structures, as described by Baddeley \cite{MemoryBaddeleyEysenkAnderson}. An effective implementation should include both short and long term stores, as well as an episodic buffer. The LTS includes information regarding semantic links between words, the STS should contian information about the local context of a word, and the Episodic Buffer should contain information about the wider context of a word.
+	
+	\item \textbf{A system for reading in a corpus} \newline
+	An input corpus must be processed in such a way that the context of a section of text (i.e. a small set of sentences) is represented by the STS, and the context of the corpus read so far is represented by the Episodic Buffer. This should be done using activation and forgettingin the STS, so as to comply with R. Atkinson and R. Shiffrin's model \cite{ControlProcessesSTMAtkinson}.
+		
+	
+	\item \textbf{A computational model of disambiguation} \newline
+	This model should make use of the both the local context of a word and knowledge of its frequency, so as to comply with \hyperref[sec:DisambiguationModels]{the Multiple Access Model} \cite{PsychologyOfLanguage}. The contextual disambiguation of a word should make use of the semantic links between its own, and other local words definitions. This would be most appropriately done using the most apparent relation, \hyperref[Hypernym]{hyponomy} \cite{WN2Nouns, WN4Verbs}.
+	
+\end{itemize}
+
+The completed project will be evaluable according to the above critera, with a completely successful system meeting all of these.
+
+\subsection{Project Organisation}
+\label{sec:ProjectOrg}
 
 
 
