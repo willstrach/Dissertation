@@ -396,7 +396,7 @@ Previous attempts at the problem of semantic analysis, don't necessarily correla
 \label{sec:ProjectAim}
 The overall aim of this project is to build a system capable of finding the correct definitions of each word in a corpus. This problem is divisible into a set of smaller problems. 
 
-\begin{itemize}
+\begin{enumerate}
 	\item \textbf{A computational model of memory structures} \newline
 		This model must based upon the memory structures, as described by Baddeley \cite{MemoryBaddeleyEysenkAnderson}. An effective implementation should include both short and long term stores, as well as an episodic buffer. The LTS includes information regarding semantic links between words, the STS should contian information about the local context of a word, and the Episodic Buffer should contain information about the wider context of a word.
 	
@@ -407,7 +407,7 @@ The overall aim of this project is to build a system capable of finding the corr
 	\item \textbf{A computational model of disambiguation} \newline
 	This model should make use of the both the local context of a word and knowledge of its frequency, so as to comply with \hyperref[sec:DisambiguationModels]{the Multiple Access Model} \cite{PsychologyOfLanguage}. The contextual disambiguation of a word should make use of the semantic links between its own, and other local words definitions. This would be most appropriately done using the most apparent relation, \hyperref[Hypernym]{hyponomy} \cite{WN2Nouns, WN4Verbs}.
 	
-\end{itemize}
+\end{enumerate}
 
 The completed project will be evaluable according to the above critera, with a completely successful system meeting all of these.
 
@@ -491,9 +491,11 @@ It can be seen that, in Listing \ref{lst:HypernymActivation},there exists a func
 One function which fits this criteria is $-\log(x)$, shown in Figure \ref{fig:logGraph}. The values given by the function, for higher values of $x$ are relatively high, favouring more general hypernyms heavily. For lower values of $x$, the values given are relatively low, causing more general hypernyms to have a lower activation increase.
 
 It may be necessary to tune this function during experimentation, to provide greater accuracy, meaning more variables must be added. With these additions, the full model is:
-\[f(x) = -b\log(ax)\]
-where $a$ and $b$ are varied during experimentation, and $x$ is the depth of the hypernym. When the depth = 0 (i.e. the activation of the root synset) the model would require the calculation of log(0), which is undefined. For this reason, an offset of 0.001 was added, making the final model:
-\[f(x) = -b\log(ax+0.001)\]
+\[f(x) = -b\log(\frac{x}{a})\]
+where $a$ and $b$ are varied during experimentation, and $x$ is the depth of the hypernym. $a$ defines where the function passes through the x axis, i.e the maximum hypernym depth, and $b$ defines how steep the function is.
+
+When the depth = 0 (i.e. the activation of the root synset) the model would require the calculation of log(0), which is undefined. For this reason, an offset of 0.001 was added, making the final model:
+\[f(x) = -b\log(\frac{x}{a}+0.001)\]
 The size of the offset needed to be small to reduce its impact on the overall model.
 
 
@@ -619,7 +621,7 @@ END FUNCTION
 
 \subsubsection{Context}
 \label{sec:DisambiguationContext}
-The context used for disambiguation its taken from two sources, the STS and knowledge of noun-verb relationships (the latter is discussed in the \hyperref[Sanity]{Sanity Checking Section}).
+The context used for disambiguation its taken from two sources, the STS and knowledge of noun-verb relationships (the latter is discussed in the \hyperref[sec:Sanity]{Sanity Checking Section}).
 
 Initially, the context contained in the STS is used. Two algorithms for disambiguation using this context have been implemented, one using hyponyms and one using hypernyms.
 
@@ -690,7 +692,7 @@ END FUNCTION
 As stated previously, in cases where context cannot provide a viable synset, the above is used for disambiguation.
 
 \subsubsection{Sanity Checking}
-\label{Sanity}
+\label{sec:Sanity}
 Given the sentence:
 \[He\: fixed\: the\: bug\]
 The reader knows that "bug" refers to a computer bug, due to its use with the verb "fixed". So far, the system has no way of modelling the contextual effects of nouns on verbs, so the system is likely to produce invalid sentences. For this reason, post-disambiguation sanity checks occur.
@@ -752,7 +754,237 @@ It may be noted that sanityCheck only considers verb incorrectness. As stated in
 
 
 \section{Results and Evaluation}
-\label{sec:Results}
+\label{sec:EvResults}
+Throughout this section, the system described previously, in section \ref{sec:Implementation}, will be evaluated. Each part of the system will be evaluated, with their parameters being adjusted, to produce the optimal performance. The criteria described in the \hyperref[sec:ProjectAim]{Project Aims subsection} will also be used to evaluate the system as a whole.
+
+In order to test the system, the SEMCOR corpus, described in subsection \ref{sec:SEMCOR}, will be used. With the \hyperref[sec:Sanity]{sanity checking system} requiring data to be extracted from the corpus, a subsection of the corpus will need to be used for testing alone. The rest of the corpus can then be used for data extraction, without skewing the results of testing in the positive direction.
+
+For the purposes of parameter adjustment, the system will be tested on a single document, to reduce the time taken for each test. This will be taken into account when evaluating the results of this process. The system will then be tested across 5 documents ranging across a variety of topics. This will give a more thorough indication of the system's actual performance. 
+
+Two critera will be used to evaluate each part of the system, accuracy and the amount of synsets directly seen in the STS. As many would expect, a higher value for the accuracy would imply a more successful system. The number of directly seen synsets is a less clear method for evaluation. A high number of synsets directly seen would imply that the either, the local context of a word is not strong, or the STS has failed to correctly represent the local context. An effective STS would contain hypernyms of the words in each sentence, meaning the more general concepts of the context are represented.
+
+\subsection{Random Chance}
+\label{sec:EvRandomChance}
+The most basic form of disambiguation system is one which selects a synset for each word based upon random chance. When tested, the system gives an accuracy of 0.7\%, a very poor performance. This is not unexpected, given the number of possible synsets a word can have, a random choice is unlikely to select the correct one, especially in cases where a word has many possible synsets (for example, verbs).
+
+It can  be seen, that a system based upon random chance alone is not useful. The process of finding the correct synset could be improved by including knowledge about each possibility.
+
+\subsection{Frequncy}
+\label{sec:EvFrequency}
+The next step up from the Random Chance system would be one which relies upon the frequency of each synset. This system makes use of the \hyperref[lst:synsetFrequency]{synsetFrequency function}, shown in Listing \ref{lst:synsetFrequency}, to find the most likely synset for each word.
+
+When tested, this system performs significantly better than \hyperref[sec:EvFrequency]{random chance}, with an accuracy of 12\%. Even though it is an improvement, it can be seen that Frequency alone does not produce a satisfying result. From this, we can tell that frequenncy only plays a small part in the disambiguation of text, and contextual information is required for a more effective system.
+
+\subsection{STS}
+\label{sec:EvSTS}
+In order to introduce contextual information, the STS, described in Section \ref{sec:ImplementedSTS} can be used. The STS system has many parameters which can be varied, so the process of testing will have to be broken down.
+
+\subsubsection{STS Size}
+\label{sec:EvSTSSize}
+In section \ref{ShortTerm}, it was identified that the size of the STS existed in the range of 7$\pm$2 items. In order to find the optimal value for this STS system, each size in the range will need to be tested.
+
+A larger STS could give a broader impression of the local context, with more synsets being present. The ability to hold more synsets could also lead to ambiguity existing in the STS, with multiple synsets relating to different possible definitions of each word being present. Reducing STS size would decrease the possibility for ambiguity, but it could also reduce the amount of context the system is able to represent.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|p{8em}|p{8em}|p{8em}|}
+	\hline
+	STS size & Accuracy (\%) & Directly Seen (\%) \\
+	\hline
+	5 & 47 & 48\\
+	\hline
+	6 & 47 & 51\\
+	\hline
+	7 & 46 & 54\\
+	\hline
+	8 & 46 & 55\\
+	\hline
+	9 & 46 & 58\\
+	\hline
+\end{tabular}
+\end{center}
+\caption{The effect of STS size on system performance}
+\label{table:STSSize}
+\end{table}
+
+As can be seen in table \ref{table:STSSize}, an increased STS size leads to a minimal decrease in the accuracy of the system. Contrary to this, the number of synsets directly seen increases significantly, implying the STS's ability to represent the local context, is hindered by a larger size.
+
+Given the results of this test, it has een decided that 5 is the optimal size for the STS. When presented with a larger number of test documents, the system performs with an accuracy of 35\%, having 45\% of synsets directly seen in the STS. This is significantly better performance than \hyperref[sec:EvFrequency]{ a system based soley on frequency}.
+
+\subsubsection{Activation Function}
+\label{sec:EvActivation}
+The activation function, described in section \ref{sec:activation}, is responsible for how synsets are activated. Previously, a linear activation function was proposed by \hyperref[sec:MattBurke]{Matt Burke}, where the activation of hypernyms was reduced according to a constant factor. This function was used in the previous test,and will be used as a benchmark, in which the logarithmic function proposed by this paper will be tested against. 
+
+\[f(x) = -b\log(\frac{x}{a}+0.001)\]
+
+In the function described in section \ref{sec:activation}, shown above, there exist two variables, $a$ and $b$, which can be changed. The maximum hypernym depth, given by $a$, will be varied in a range from 1 to 5, and the value of $b$ will be varied between 1 and $\frac{1}{16}$.
+
+For the first test, $a$ will be varied, and $b$ will remain constant, with value 1. A small value for $a$ would lead to no hypernyms being activated, causing a loss of generality in the STS, meaning poor representation of the local context. With large values, the contents of the STS could become too general, giving the same problems as a small $a$.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|p{2em}|p{7em}|p{7em}|}
+	\hline
+	a & Accuracy (\%) & Directly Seen (\%) \\
+	\hline
+	1 & 45 & 40\\
+	\hline
+	2 & 46 & 39\\
+	\hline
+	3 & 45 & 44\\
+	\hline
+	4 & 46 & 40\\
+	\hline
+	5 & 43 & 40\\
+	\hline
+\end{tabular}
+\end{center}
+\caption{The effect of changing $a$ on system performance}
+\label{table:aActivation}
+\end{table}
+
+Given the results shown in table \ref{table:aActivation}, the best performance is given when $a = 2$. For this reason, the value of 2 will be used when testing different values for $b$.
+
+A high value of $b$ would favour less general synsets significantly more than their hypernyms. Smaller values would reduce this effect, though more general synsets may come to dominate the STS, leading to poor representation of local context.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|p{2em}|p{7em}|p{7em}|}
+	\hline
+	b & Accuracy (\%) & Directly Seen (\%) \\
+	\hline
+	1 & 46 & 39\\
+	\hline
+	$\frac{1}{2}$ & 47 & 45\\
+	\hline
+	$\frac{1}{4}$ & 46 & 51\\
+	\hline
+	$\frac{1}{8}$ & 47 & 52\\
+	\hline
+	$\frac{1}{16}$ & 46 & 52\\
+	\hline
+\end{tabular}
+\end{center}
+\caption{The effect of changing $b$ on system performance}
+\label{table:bActivation}
+\end{table}
+
+Given the results shown in table \ref{table:bActivation}, it can be seen that a value of 1 for $b$, achieves the best balance between accuracy and the number of synsets directly seen. With more testing data, the system produces an accuracy of 35\%. This is no imporvement from the previously used method. Though the accuracy has remained consistent, only 39\% of synsets were directly seen, implying more generality in the STS, without loss of performance.
+
+\subsection{Episodic Buffer}
+\label{sec:EvEpisodicBuffer}
+The episodic buffer, described in section \ref{sec:ImplementedEpisodicBuffer} aims to provide a more global context than the STS. With the functionality of the buffer being relatively simple, only one varibale exists, the boost provided by a previously seen synset, with a greater boost giving global context a larger impact on disambiguation. The size of this boost will be varied between 0 (i.e. no episodic buffer) and 2.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|p{2em}|p{7em}|p{7em}|}
+	\hline
+	Boost & Accuracy (\%) & Directly Seen (\%) \\
+	\hline
+	0 & 46 & 39\\
+	\hline
+	0.5 & 48 & 35\\
+	\hline
+	1 & 51 & 21\\
+	\hline
+	1.5 & 51 & 19\\
+	\hline
+	2 & 51 & 22\\
+	\hline
+\end{tabular}
+\end{center}
+\caption{The effect of changing the episodic buffer boost on system performance}
+\label{table:EBboost}
+\end{table}
+
+The results in table \ref{table:EBboost} show that the use of an episodic buffer dramatically improves performance, with an optimal boost of 1.5. When provided with 5 documents, as opposed to 1 when tuning parameters, the system produces an accuracy of 39\%, with 23\% of synsets directly seen, giving an increase in both accuracy, and the generality of the STS. 
+
+\subsection{Disambiguation}
+\label{sec:EvDisambiguation}
+
+
+\subsubsection{Algorithm}
+\label{sec:EvDisAlgorithm}
+Up until this point, the \hyperref[lst:hyponymSearch]{hyponym based algorithm} has been used for testing, described in section \ref{sec:ImplementedDisambiguation}. Another algorithm, \hyperref[lst:hypernymSearch]{hypernymSearch}, has also been proposed. Table \ref{table:Algorithm} show the result of this testing.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|p{7em}|p{7em}|p{7em}|}
+	\hline
+	Algorithm & Accuracy (\%) & Directly Seen (\%) \\
+	\hline
+	Hyponym & 51 & 19\\
+	\hline
+	Hypernym & 50 & 19\\
+	\hline
+\end{tabular}
+\end{center}
+\caption{The effect of changing the disambiguation algorithm on system performance}
+\label{table:Algorithm}
+\end{table}
+
+As can be seen, the hypernym based algorithm produces no benefit over the usage of hyponyms. For this reason hyponyms will continue to be used, and the benchmark given by the \hyperref[sec:EvEpisodicBuffer]{previous section} still stands. 
+
+\subsubsection{Delay}
+\label{sec:EvDisDelay}
+In section \ref{sec:ImplementedDisambiguation}, a delay between reading and disambiguation is proposed. This delay is measured in sentences read, and will be varied between 0 and 2. A larger delay could cause the local context of a word to be underrepresented when disambiguation takes place, though it may also give the system chance to resolve ambiguity in the STS, before its contents are used.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|p{2em}|p{7em}|p{7em}|}
+	\hline
+	Delay & Accuracy (\%) & Directly Seen (\%) \\
+	\hline
+	0 & 51 & 19\\
+	\hline
+	1 & 53 & 13\\
+	\hline
+	2 & 53 & 12\\
+	\hline
+\end{tabular}
+\end{center}
+\caption{The effect of changing the disambiguation delay on system performance}
+\label{table:Delay}
+\end{table}
+
+Delaying disambiguation by 2 sentences has a positive effect on the overall performance of the system, as shown in table \ref{table:Delay}. The most notable effect of the delay, is the reduction in synsets directly seen. This shows that the delay gives the system time to remove less general synsets from the STS. When provided with more input data, the improvement is still present, with an accuracy of 40\%, and 15\% of synsets directly seen.
+
+\subsubsection{Sanity Checking} 
+\label{sec:EvDisSanity}
+The sanity checking system, described in section \ref{sec:Sanity}, makes use of information regarding noun-verb relationships to check the disambiguation output, and feed-back to the algorithm. The relatively limited noun-verb relationship data may hinder the disambiguation algorithm, by dismissing valid results, though it could equally improve performance, especially in cases where a large number of possibilities are present.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|p{5em}|p{7em}|p{7em}|}
+	\hline
+	Sanity Check & Accuracy (\%) & Directly Seen (\%) \\
+	\hline
+	On & 53 & 12\\
+	\hline
+	Off & 50 & 11\\
+	\hline
+\end{tabular}
+\end{center}
+\caption{The effect of sanity checks on system performance}
+\label{table:Sanity}
+\end{table}
+
+As it can be seen in table \ref{table:Sanity}, sanity checking reduces the accuracy of the system. For this reason, it can be seen that it is not useful in its current state, and can be eliminated from the system.
+
+\subsection{Project Aims}
+\label{EvAims}
+In section \ref{sec:ProjectAim}, three aims for the project were established.
+
+\subsubsection{A computational model of memory structures}
+\label{EvAims1}
+The memory structures implemented are modelled on those described by Baddeley \cite{MemoryBaddeleyEysenkAnderson}.
+
+\subsubsection{A system for reading in a corpus}
+\label{EvAims2}
+
+\subsubsection{A computational model of disambiguation}
+\label{EvAims2}
+
 
 \section{Conclusions}
 \label{sec:Conclusions}
