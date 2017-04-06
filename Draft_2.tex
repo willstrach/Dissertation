@@ -20,7 +20,7 @@
         \vspace*{1cm}
         
         \Huge
-        \textbf{Using WordNet and a Short-Term Memory model for Contextual Disambiguation}
+        \textbf{Using WordNet and a Short-Term Memory model for Semantic Analysis}
         \vspace{2cm}
         
         \Large
@@ -31,8 +31,13 @@
         \vspace{0.8cm}
         
         \Large
-        Wordcount - 9191\\
-        (Wordcount produced using wc - w)\\
+        Wordcount - 10640\\
+        \small
+        (Wordcount produced using wc - w, \\
+        this includes all the body of the report,\\
+         and Appendix A)\\
+        \large
+        \vspace{0.8cm}
         Supervisor - Dr Dimitar Kazakov\\
         Department of Computer Science\\
         University of York\\
@@ -70,15 +75,24 @@ Natural language is the language spoken and written by humans. It is very powerf
 	\item \textbf{Text Preprocessing} \\
 	Before any analysis can take place, the input raw text must be converted into a usable format \cite{NLPHandbook}.
 	\item \textbf{Lexical Analysis} \\
-	One word can have multiple forms, for example ”judge” (the lemma) has the
-	forms {”judge”, ”judges”, ”judging”, ”judged”} (morphological variants). The job of Lexical Analysis is to replace all morphological variants of a word, with their corresponding lemma, a process known as stemming \cite{NLPHandbook}.
+	One word can have multiple forms, for example ”judge” (the lemma) has the forms {”judge”, ”judges”, ”judging”, ”judged”} (morphological variants). The job of Lexical Analysis is to replace all morphological variants of a word, with their corresponding lemma, a process known as stemming \cite{NLPHandbook}.
 	\item \textbf{Syntactic Parsing} \\
 	When deriving meaning from sentences, the grammatical structure can provide important insight. The Syntactic parsing technique extracts this information using Part-of-Speech tagging (detecting syntactic role) and Chunking (detecting noun and verb phrases) \cite{NLPHandbook}.
 	\item \textbf{Semantic Analysis} \\
 	The derivation of meaning from the sentences tokens \cite{NLPHandbook}. 
 \end{itemize}
 
-Semantic Analysis is a problem which continues to draw attention from researchers, due to the lack of a truly capable solution \cite{NLPHandbook}. Most would agree that, though a good computational solution is not available, the human brain performs impressively well when confronted with the same problem. Given the example:
+Semantic analysis is a problem which continues to draw attention from researchers, due to the lack of a truly capable solution \cite{NLPHandbook}. If found, a reliable semantic analysis system would have many applications, a subset of these being:
+
+\begin{itemize}
+	\item \textbf{Voice Recognition} has, over recent years, become an increasingly useful feature in consumer electronics. Conceptually, it can be seen that a system's ability to respond to voice input would be improved by a better semantic analysis.
+	
+	\item \textbf{The Summarisation of Documents} is a problem that has been partially solved by \hyperref[sec:TFIDF]{TF-IDF}. The summarisation could be improved by the aquisition of information regading text meaning.
+	 
+	\item \textbf{The Aquisition of Information for knowledge based systems} could occur automatically,using an effective semantic analysis system in conjunction with a large corpura.
+\end{itemize}
+
+Most would agree that, though a good computational solution is not available, the human brain performs impressively well when confronted with the same problem. Given the example:
 
 \[The\: party\: led\: government\]
 
@@ -98,44 +112,51 @@ The project conducted as part of this report requires no outside participants, n
 \section{Literature Review}
 \label{sec:LitReview}
 
+In the introduction, the basic motivations behind this project were laid out. This literature review aims to describe, and discuss the previous research, upon which this project is built.The following section will cover Psycholinguistics, previous work on semantic analysis, as well as some of the tools that are used throughout the implementation.
+
 %------------ Memory Models
 \subsection{Psycholinguistics}
 \label{sec:Psycholinguistics}
-Language understanding is a problem which, it can be stated, is solved by the human brain. From this satatement, it can be derived that a computational solution could be effectively built around knowledge of the processes at work in the brain. The process of language comprehension can be described using the working memory model \cite{MemoryBaddeleyEysenkAnderson}.
+The understanding of Natural language is a problem with which the human brain performs extremely well. From this satatement, it can be derived that a computational solution could be effectively built around knowledge of the processes at work in the brain. The process of language comprehension can be described, in part, using the working memory model\cite{MemoryBaddeleyEysenkAnderson}.
 
-According to Baddely et al. \cite{MemoryBaddeleyEysenkAnderson} there exist multiple, special purpose, memory structures within two main categories, the Short-term Store and the Long-term Store.  
+According to Baddely et al. \cite{MemoryBaddeleyEysenkAnderson} there exist multiple, special purpose, memory structures within two main categories, the Short-term Memory and the Long-term Memory. The working memory model describes how information can pass between the different structures, either originating from the Long-term Memory, or sensory inputs \cite{MemoryBaddeleyEysenkAnderson}.
 
-\subsubsection{Long-term Store}
+\subsubsection{Long-term Memory}
 \label{LongTerm}
-The long-term store (LTS) contains semi-permanent information. Within the LTS, there exist Explicit and Implicit memory structures. The contents of the Implicit memory describe skills and methods of doing things, whereas the Explicit memory contains factual information\cite{MemoryBaddeleyEysenkAnderson}. When considering these structures, it can be seen that Explicit memory is of greater interest in the context of NLP.
+The long-term memory (LTM) contains semi-permanent information. Within the LTM, there exist Explicit and Implicit memory structures. The contents of the Implicit memory describe skills and methods of doing things, whereas the Explicit memory contains factual information\cite{MemoryBaddeleyEysenkAnderson}. When considering these structures, it can be seen that Explicit memory is of greater interest in the context of NLP.
 
-Within the Explicit memory exists knowledge of semantics \cite{MemoryBaddeleyEysenkAnderson}. The information held here not only defines concepts (meanings of word forms), but also their attributes and rules of use. In 1966, M. Quillain proposed a model of Semantic Memory \cite{SemanticMemoryQuillain}. The model consists of a graph of nodes, each representing a concept, connected by edges of differing types, each representing a different syntactic feature (for example, hypernym). 
+Within the Explicit memory exists knowledge of semantics \cite{MemoryBaddeleyEysenkAnderson}. The information held here not only defines concepts (meanings of word forms), but also their attributes and rules of use. In 1966, M. Quillain proposed a model of Semantic Memory \cite{SemanticMemoryQuillain}. The model consists of a graph of nodes, each representing a concept, connected by edges of differing types, each representing a different syntactic feature (for example, hypernym).  
 
 
-\subsubsection{Short-term Store}
+\subsubsection{Short-term Memory}
 \label{ShortTerm}
-The short-term store (STS) is a structure of limited capacity, used to store items for periods usually of no more than a few seconds \cite{MemoryBaddeleyEysenkAnderson}. In 1955, G. Miller, based upon previous experimental results, concluded that the size of the STS existed in the realm of 7$\pm$2 items of information \cite{SevenPlusMinusTwo}. 
+The short-term memory (STM) is a structure of limited capacity, used to store items for periods usually of no more than a few seconds \cite{MemoryBaddeleyEysenkAnderson}. In 1955, G. Miller, based upon previous experimental results, concluded that the size of the STM existed in the realm of 7$\pm$2 items of information \cite{SevenPlusMinusTwo}. 
 
-In 1971, R. Atkinson and R. Shiffrin proposed a model of the STS \cite{ControlProcessesSTMAtkinson}. In this model, the STS can both send information to, and draw information from the LTS. Inputs from the sensory registers (memory structures holding information relating to inputs from senses) are also sent to the STS. Atkinson and Shiffrin proposed that, over time, the activation of items in the STS decreased; they went on to theorise that items could be lost from the STS, only when a new, more highly activated item could take its place. To counter this loss of activation, the authors discussed the control process, rehearsal. This process makes use of repetition to increase the activation of items in memory, decreasing their chance of loss. 
+In 1971, R. Atkinson and R. Shiffrin proposed a model of the STM \cite{ControlProcessesSTMAtkinson}. In this model, the STM can both send information to, and draw information from the LTM. Inputs from the sensory registers (memory structures holding information relating to inputs from senses) are also sent to the STM. Atkinson and Shiffrin proposed that, over time, the activation of items in the STM decreased; they went on to theorise that items could only be lost from the STM when a new, more highly activated item could take its place. To counter this loss of activation, the authors discussed the control process, rehearsal. This process makes use of repetition to increase the activation of items in memory, decreasing their chance of loss. 
 
+\subsubsection{Episodic Buffer}
+\label{sec:EpisodicBuffer}
+When considering the reading of text, it was found that participants were able to recall significantly more than 7$\pm$2 items of information. In 2000, a structure linking the STM and LTM was proposed by Baddely \cite{BaddeleyEpisodicBuffer}. The Episodic Buffer makes use of sensory data to store information too old to exist in the STM, without committing it to the LTM. This often occurs through the use of imagery to represent a set of concepts \cite{MemoryBaddeleyEysenkAnderson}. When applied to natural language, this memory structure allows the representation of a greated context than the STM alone.
 
 \subsubsection{Disambiguation Models}
 \label{sec:DisambiguationModels}
 In some cases, when assigning meaning to words, ambiguity can arise. Some words have multiple concepts, for example, bank can refer to a building, or a sloped surface alongside a body of water. In such cases, the brain uses some process to select the correct concept. One such model of this disambiguation is the Multiple-access model \cite{PsychologyOfLanguage}.
 
-According to the multiple-access model, when presented with an ambiguious word, initially all corresponding concepts are activated \cite{AccessingLexicalAmbiguities}. The most appropriate concept is then chosen using context and frequency.
+According to the multiple-access model, when presented with an ambiguious word, initially all corresponding concepts are activated \cite{AccessingLexicalAmbiguities}. The most appropriate concept is then chosen using a balance of context and frequency.
 
-Previously, we established that the process of disambiguation begins with the activation of all possible word concepts. The context-sensitive model deals with the use of context and frequency in the selection of the most appropriate of these \cite{PsychologyOfLanguage}. In cases where the context is strong, i.e. the correct concept can be chosen using it's surrounding context, the context is primarily relied upon for disambiguation. In the opposite case, i.e. when context gives little indication of which is the correct concept, the most frequenly used concept is used, assuming it fits with the available context.
+The context-sensitive model extends the multiple-access model, by more appropriately using context and frequency in the selection of the most appropriate of concept \cite{PsychologyOfLanguage}. In cases where the context is strong, i.e. the correct concept can be chosen using it's surrounding context, the context is primarily relied upon for disambiguation. In the opposite case, i.e. when context gives little indication of which is the correct concept, the most frequently used concept is used, assuming it fits with the available context.
 
 
 %------------ WORDNET
 \subsection{Wordnet}
 \label{Wordnet}
+In order to build a successful system, within the time bounds given by this project, a good, preexisting, model of semantic memory is required. One such example of this is Wordnet \cite{WN1Introduction}.
+
 In 1990, it was noted by G. Miller et al. that current attemps to organise the english lexicon, i.e. conventional dictionaries, offered few benefits when used in conjunction with computers \cite{WN1Introduction}. Wordnet was an effort to produce a dictonary, containing more information than a conventional dictionary, that could be useful for computational applications.
 
-\label{Synsets}Central to the design of wordnet, is the idea of synsets \cite{WN1Introduction}. The authors began using the assumption that all concepts can be uniquely defined by their set of synonyms (words which share like meaning). In most cases, this assumption holds true, though, in cases where more detail is required, a "gloss" was added \cite{WN1Introduction}.
+\label{Synsets}Central to the design of wordnet, is the idea of synsets \cite{WN1Introduction}. The authors began using the assumption that all word meanings can be uniquely defined by their set of synonyms (words which share like meaning). In most cases, this assumption holds true, though, in cases where more detail is required, a "gloss" was added \cite{WN1Introduction}.
 
-Wordnet builds upon models of the semantic memory, such as that discussed in the \hyperref[LongTerm]{Long-term store section} \cite{WN1Introduction}. The overall structure relies on four main semantic relations:
+Wordnet builds upon models of the semantic memory, such as that discussed in the \hyperref[LongTerm]{Long-term memory section} \cite{WN1Introduction}. The overall structure relies on four main semantic relations:
 
 \begin{itemize}
 	\item Synonymy
@@ -160,11 +181,11 @@ Wordnet builds upon models of the semantic memory, such as that discussed in the
 	
 \end{itemize}
 
-It is common knowledge that words can fall into one of a number of categories, nouns, adjectives, verbs and adverbs. G. Miller et al. note that, due to the differences in the relations between words in these categories, each type has differs in the structure they produce and are therefore held in different files \cite{WN1Introduction}. The proceeding subsections will go into each of thesecategories in more detail.
+It is common knowledge that words can fall into one of a number of categories, nouns, adjectives, verbs and adverbs. G. Miller et al. note that, due to the differences in the relations between words in these categories, each type has differs in the structure they imply, and are therefore held in different files \cite{WN1Introduction}. The proceeding subsections will go into each of these categories in more detail.
 
 \subsubsection{Nouns}
 \label{Nouns}
-G. Miller et al. note that a noun can be defined using only its immediate hypernym, and how it differs from its hypernyms other hyponyms \cite{WN2Nouns}. From this, it can be seen that hyponymy is perhaps the most important relation in the organisation of nouns. For this reason, nouns form a hierachical structure in wordnet.
+G. Miller et al. note that a noun can be defined using only its immediate hypernym, and how it differs from its hypernyms other hyponyms \cite{WN2Nouns}. From this, it can be seen that hyponymy is perhaps the most important relation in the organisation of nouns. For this reason, nouns form a strong hierachical structure in wordnet.
 
 Wordnet's designers stated the assumption that all nouns can be contained in a single hierachial structure \cite{WN2Nouns}. The issue with having a single word, of which all other words are hyponyms, is that this hypernym is relatively meaningless. It was instead decide to divide all words into 25 separate files, each containing a hierachical tree beginning with one of the following synsets \cite{WN2Nouns}:
 
@@ -198,7 +219,7 @@ Wordnet's designers stated the assumption that all nouns can be contained in a s
 \end{itemize}
 \end{multicols}
 
-Other than synonymy, nouns have three other important features \cite{WN2Nouns}:
+Other than synonymy and hyponymy, nouns have three other important features \cite{WN2Nouns}:
 \begin{itemize}
 	\item Attributes
 	\begin{itemize}
@@ -216,6 +237,8 @@ Other than synonymy, nouns have three other important features \cite{WN2Nouns}:
 	\end{itemize}		
 	
 \end{itemize}
+
+Currently, all the described relations, excluding functions have been implemented into WordNet. Function words are a proposed feature, though adding this semantic link may prove difficult \cite{WN2Nouns}. Each noun has a potentially huge amount of functions, adding all of these may prove to be redundant, therefore it may be more useful for the most common (i.e. the most useful) to be included.
 
 \subsubsection{Adjectives}
 \label{Adjectives}
@@ -238,7 +261,7 @@ Adjectives in can be divided into four distinct groups, each implying a differen
 	
 	\item Relational Adjectives
 	\begin{itemize}
-		\item In the phrase "maternal instinct", it can be seen that the adjective is derived from a noun, in this case "mother"; this is the defining feature of relational adjectives \cite{WN3Adjectives}. In wordnet, relational adjectives are linked to their noun form, meaning they don't posess their own structure, instead falling into that described in the \hyperref[Nouns]{Noun section}.
+		\item In the phrase "maternal instinct", it can be seen that the adjective is derived from a noun, in this case "mother"; this is the defining feature of relational adjectives \cite{WN3Adjectives}. In wordnet, relational adjectives are linked to their noun form, meaning they do not posess their own structure, instead falling into that described in the \hyperref[Nouns]{Noun section}.
 	\end{itemize}		
 		
 	
@@ -247,7 +270,7 @@ Adjectives in can be divided into four distinct groups, each implying a differen
 
 \subsubsection{Verbs}
 \label{Verbs}
-In C. Fellbaums 1990 paper, "English Verbs as a Semantic Net", she discussed the lack of true synonymy across the verb category \cite{WN4Verbs}. This is an issue for Wordnet's designers, with their reliance on \hyperref[Synsets]{synsets}. The author goes on to describe the solution, periphrases, the use of verb phrases to give more meaning to a simple verb. In the paper, the example synset, \{swim, travel through water\} was given. 
+In C. Fellbaums 1990 paper, "English Verbs as a Semantic Net", she discussed the lack of true synonymy across the verb category \cite{WN4Verbs}. This is an issue for Wordnet's designers, with their reliance on \hyperref[Synsets]{synsets}. The author goes on to describe the solution, periphrases, the use of verb phrases to give more meaning to a simple verb. In the paper, the example synset, \{swim, travel through water\} was given\cite{WN4Verbs}. 
 
 The relationships between verbs follow a hierachy shown in Figure \ref{fig:WN4Verbs_pp15}, with each type elaborated upon in the following paragraphs.
 
@@ -288,13 +311,13 @@ TF-IDF is an algorithm which, when given a document, outputs its most important 
 \[t_i = f_t * (log_2(n)-log_2(f_d)+1)\]
 Where \(t_i\) is the importance of the word, \(f_t\) is the frequency of the word within the document, \(n\) is the number of documents in the corpura, and \(f_d\) is the frequency of the word across all documents in the corpura \cite{SeddingKazakov}. The  words with the highest importance are then outputted.
 
-In 2004, J. Sedding and D. Kazakov proposed an extension to the TF-IDF algorithm, using \hyperref[Wordnet]{Wordnet}. The aim of the paper was to include extra information provided by wordnet (synsets and hypernyms) in conjuncton with \hyperref[PoSTag]{PoS tagging}, to provide an output more suited to the categorisation of documents \cite{SeddingKazakov}. The authors ran multiple experiments, in order to compare different usage of additional information. unfortunately, it was found that their method was less effective than TF-IDF alone. As the authors stated, this is likely due to the lack of disambiguation, i.e. all synsets were used for each word, adding noise.
+In 2004, J. Sedding and D. Kazakov proposed an extension to the TF-IDF algorithm, using \hyperref[Wordnet]{Wordnet}. The aim of the paper was to include extra information provided by wordnet (synsets and hypernyms) in conjuncton with \hyperref[sec:IntroContext]{PoS tagging}, to provide an output more suited to the categorisation of documents \cite{SeddingKazakov}. The authors ran multiple experiments, in order to compare different usage of additional information. unfortunately, it was found that their method was less effective than TF-IDF alone. As the authors stated, this is likely due to the lack of disambiguation, i.e. all synsets were used for each word, adding noise.
 
 \subsubsection{Neural Networks}
 \label{sec:NeuralNetwork}
-In recent years the use of Neural Networks, more specifically Deep Neural Networks, in the solving of computational problems has dramatically increased. More recently, this technique has been applied to the problem of natural language processing. As discussed in the \hyperref[sec:NLP]{Natural Language Processing section}, it was shown that assigning varyng labels to words and phrases (i.e. categorisation) made up a large proportion of the processes, a job neural networks are wellsuited to, and often associated with \cite{NeuralNetworks}. 
+In recent years the use of Neural Networks, more specifically deep learning Neural Networks, in the solving of computational problems has dramatically increased. More recently, this technique has been applied to the problem of natural language processing. As discussed in the \hyperref[sec:NLP]{Natural Language Processing section}, it was shown that assigning varying labels to words and phrases (i.e. categorisation) made up a large proportion of the processes, a job neural networks are wellsuited to, and are often associated with \cite{NeuralNetworks}. 
 
-The first process requrired in the use of neural networks, is the conversion of raw text into a vector-base representation, giving a sentance as a set of vectors. The sentence is then passed into the neural network \cite{NeuralNetworks}. The network proposed by R.Collobert and J. Weston in 2008 contained multiple layers, each serving its own purpose \cite{NeuralNetworks}. Initially the network identifies word features, before using this data to calculate the probability of each synset of each word.
+The first process requrired in the use of neural networks, is the conversion of raw text into a numerix, vector-based representation, capable of being processed. The sentence is then passed into the neural network \cite{NeuralNetworks}. The network proposed by R.Collobert and J. Weston in 2008 contained multiple layers, each serving its own purpose \cite{NeuralNetworks}. Initially the network identifies word features, before using this data to calculate the probability of each synset of each word.
 
 It was found by the authors that their model provided good results, though, in order to get these results, a large amount of time was deicated to training \cite{NeuralNetworks}.
 
@@ -307,7 +330,7 @@ As words are encountered, their activation, and the activation of their hypernym
 \[H = \sum\limits_{i=1}^N S_i \times A\]
 Where \(A\) is the attenuation, found through experimentation, \(S_i\) is the activation of the hyponyms. This model was used to prevent more general synsets dominating the short-term memory, whilst boosting hypernyms of synsets more if a similar synset also occurs in close proximity \cite{MattBurkePrevious}.
 
-The author noted that, highly activated synsets could remain in the short-term memory indefinitely. To counter this issue, and to remain in line with the memory models discussed in the \hyperref[ShortTerm]{Short-term store section}, the process of forgetting was added to the model, by multiplying the activation value by a number found by experimentation \cite{MattBurkePrevious}. Forgetting occurs over time, decreasing the activations of items in the Short-term memory and the Semantic memory, the latter by a greater degree.
+The author noted that, highly activated synsets could remain in the short-term memory indefinitely. To counter this issue, and to remain in line with the memory models discussed in the \hyperref[ShortTerm]{Short-term memory section}, the process of forgetting was added to the model, by multiplying the activation value by a number found by experimentation \cite{MattBurkePrevious}. Forgetting occurs over time, decreasing the activations of items in the Short-term memory and the Semantic memory, the latter by a greater degree.
 
 In the proposed model, the corpus is processed sentence by sentence. Two methods of disambiguation were proposed, with both cases beginning by removing non-useful words, and converting all words into their base forms (e.g. "flies" $\Rightarrow$ "fly"), each model differs in its use of the contents of the short term memory.
 \begin{itemize}
@@ -324,11 +347,11 @@ As mentioned previously, the values of some variables were found using experimen
 	\end{itemize}
 	\item Short-term memory size
 	\begin{itemize}
-		\item[] It was found that a STM size of 5 was optimal, with a 67\% accuracy.
+		\item[] It was found that a STM size of 5 was optimal.
 	\end{itemize}
 	\item The Attenuation value
 	\begin{itemize}
-		\item[] The author found that an attenuation value of between 0.7 and 0.9 gave the best result, with an accuracy of 67\%.
+		\item[] The author found that an attenuation value of between 0.7 and 0.9 gave the best result.
 	\end{itemize}
 	\item Forgetfulness
 	\begin{itemize}
@@ -338,62 +361,66 @@ As mentioned previously, the values of some variables were found using experimen
 
 Unfortunately, the model failed to produce the correct synset significantly more accurately than the author's baseline (selecting the most common synset) \cite{MattBurkePrevious}. As suggested in the report, this may be due to semantic links, which occur in the brain, not being available or utilsed by the model. Though, it may also be the case that the mathematical models used were inaccurate, with less linear functions being required.
 
+The memory structures use may also have contributed to the result. Each item in the LTM had an activation \cite{MattBurkePrevious}. This activation is not present in the models developed by Baddeley, Shiffrin and Atkinson \cite{MemoryBaddeleyEysenkAnderson, ControlProcessesSTMAtkinson}.
 
+\subsection{SemCor}
+\label{sec:SEMCOR}
+\cite{SEMCOR}
+In order to test the system developed in this project, an input corpus is required. SemCor (semantically-tagged corpus) was found to be a useful corpus, for a number of reasons.
 
-
-
+\begin{itemize}
+	\item \textbf{Range of Topics} \\
+	SemCor is a subset of the Brown corpus, taking documents from the large range of categories available \cite{SEMCOR}. The result is a varied corpus which will give a more representative view of performance than a smaller collection of documents.
+	
+	\item \textbf{PoS Tags} \\
+	The corpus has already been syntactically parsed, meaning PoS tags already exist for all words in the corpus \cite{SEMCOR}. This allows the focus of the project to remain on semantic analysis, without the need to build extra sub-systems for preprocessing.
+	
+		\item \textbf{Ease of Reading} \\
+	A reader for SemCor has already been implemented as part of the Natural Language Toolkit for python (NLTK) \cite{NLTK}. The ease of reading provided by NLTK further reduces the scale of the implementation.
+	
+	\item \textbf{Semantic tags} \\
+	The most useful feature of SemCor are the semantic tags. These semantic tags provide a means for testing the accuracy of the system, by comparing its output to these tags. Each of these tags is a WordNet synset, the same format used as the output of the system, easing comparison \cite{SEMCOR}.
+\end{itemize}
 
 
 
 \section{Problem Analysis}
 \label{sec:ProbAnalysis}
 
-\subsection{Problem Definition}
-\label{sec:ProbDef}
-Semantic analysis is the process of extracting meaning from a sentence's tokens. Each individual token in a sentence has potentially many possible meanings; an effective tool should select the correct meaning, based upon each word's surrounding context. Throughout the \hyperref[sec:PrevWork]{previous work section} of the Literature Review, it is clear that Semantic Analysis is a problem which remains unsolved. 
+The literature review has given a great deal of indication to the direction of the problem. Given these findings, the problem can be defined with a greater deal of precision. The following can be read as a description of how the implementation should be approached, as well as acting as a set of aims, against which the project will be evaluable.
 
-Semantic analysis has many applications, these include:
-\begin{itemize}
-	\item \textbf{Voice Recognition} has, over recent years, become an increasingly useful feature in consumer electronics. Conceptually, it can be seen that a system's ability to respond to voice input would be improved by a better semantic analysis.
-	
-	\item \textbf{The Summarisation of Documents} is a problem that has been partially solved by \hyperref[sec:TFIDF]{TF-IDF}. The summarisation could be improved by the aquisition of information regading text meaning.
-	 
-	\item \textbf{The Aquisition of Information for knowledge based systems} could occur automatically,using an effective semantic analysis system in conjunction with a large corpura.
-\end{itemize}
-This problem can be seen to be exceptionally relevant to current technologies, making it a worthy subject of this research.
+The overall aim of this project is to build a system capable of finding the correct meaning for each word in an input corpus. Earlier, we established that the brain can reliably solve this problem and, though researchers are currently working to find a suitable computational solution, there exist successful psychological models concerning this process. 
 
-Previously, \hyperref[sec:LSA]{statistical methods} have been used to solve this problem. These methods, as stated \hyperref[sec:LSA]{previously} only consider frequency in their definition, and so are limited in their ability to handle corpura where a single word can occur multiple times throughout, with differing definitions accross these instances.
+The problem described above can be divided into three separate sub-problems.
 
-It is well known that the human brain's process of semantic analysis, is very effective. The brain's disambiguation process most likely uses the \hyperref[LongTerm]{memory structures proposed by Baddeley}\cite{MemoryBaddeleyEysenkAnderson}, containing information about relationships between word meanings. For example, given the following sentence:
+\subsection{Memory Structures}
+\label{sec:PAMem}
 
-\[The\: party\: led\: government.\]
+The brain’s ability to conduct semantic analysis is reliant upon the presence of multiple special purpose memory structures, as described by the Working Memory Model. The most prominent of these are the short-term and long-term memories, both of which should be implemented by an effective system.  As part of the working memory model used by this system, information must pass between the each of these memory structures. 
 
-the reader knows that "party"refers to a political party, likely, as discussed in the \hyperref[sec:DisambiguationModels]{Disambiguation Models section}, due to its pairing with the word "government".
+An implementation of an STM should have a finite size, falling in the range defined by G. Miller, 7$\pm$2.  Atkinson and Shiffrin’s model requires that the implemented STM contains items originating from a combination of the systems input, and LTM, each with an activation. The structure’s contents must also change, according the arrival of new items, so as to correctly represent the local context of a section of text.
 
-Previous attempts at the problem of semantic analysis, don't necessarily correlate with our knowledge of the human brain. Given this knowledge, it could be possible to produce an equivalent computational model, which may be more effective than purely statistical methods. For this reason, this project will attempt to make use of a model of the brain's disambiguation processes to build a system, capable of semantic analysis.
+The systems LTM (Semantic Memory) requires knowledge of a large number of word meanings. Each of the meanings should be coupled with useful information consisting of a number of semantic links, connecting them to other meanings. As discussed in section ??, WordNet is a capable, pre-existing database, which follows a similar structure to the LTM defined by Baddeley. For this reason, it should be used to ensure that as much semantic information can be contained in the LTS as possible within the time scale of the project.
 
-\subsection{Project Aims}
-\label{sec:ProjectAim}
-The overall aim of this project is to build a system capable of finding the correct definitions of each word in a corpus. This problem is divisible into a set of smaller problems. 
+The addition of an Episodic Buffer may also be beneficial. Baddeley’s proposal may prove difficult to implement fully within the scope of this project, so design decisions must be made to simplify the model. With that said, its functionality must remain reasonably consistent, the representation of wider context, for it to prove useful to the system.
 
-\begin{enumerate}
-	\item \textbf{A computational model of memory structures} \newline
-		This model must based upon the memory structures, as described by Baddeley \cite{MemoryBaddeleyEysenkAnderson}. An effective implementation should include both short and long term stores, as well as an episodic buffer. The LTS includes information regarding semantic links between words, the STS should contian information about the local context of a word, and the Episodic Buffer should contain information about the wider context of a word.
-	
-	\item \textbf{A system for reading in a corpus} \newline
-	An input corpus must be processed in such a way that the context of a section of text (i.e. a small set of sentences) is represented by the STS, and the context of the corpus read so far is represented by the Episodic Buffer. This should be done using activation and forgettingin the STS, so as to comply with R. Atkinson and R. Shiffrin's model \cite{ControlProcessesSTMAtkinson}.
-		
-	
-	\item \textbf{A computational model of disambiguation} \newline
-	This model should make use of the both the local context of a word and knowledge of its frequency, so as to comply with \hyperref[sec:DisambiguationModels]{the Multiple Access Model} \cite{PsychologyOfLanguage}. The contextual disambiguation of a word should make use of the semantic links between its own, and other local words definitions. This would be most appropriately done using the most apparent relation, \hyperref[Hypernym]{hyponomy} \cite{WN2Nouns, WN4Verbs}.
-	
-\end{enumerate}
+\subsection{Reading System}
+\label{sec:PARead}
 
-The completed project will be evaluable according to the above critera, with a completely successful system meeting all of these.
+In order for the system to effectively use the memory structures, a reading subsystem is required. In section ??, the input corpus, SemCor, was described. The reading system must be able to accept  this corpus, and feed it into the memory structures described previously. With the focus of this project being solely on semantic analysis, a reading system must also be able to read, and use all relevant information already existing in the input corpus (for example, PoS tags).
 
-\subsection{Project Organisation}
-\label{sec:ProjectOrg}
+In the multiple access model, all relevant concepts are activated when a word is encountered.  A successful reading system should change the contents of the STM using a series of activations. If a concept already exists in the STM, Atkinson and Shiffrin’s model’s process of rehearsal should be employed, increasing the concepts actviation.  
 
+To ensure a good representation of local context in the STM, its contents should consist of relatively general concepts.  For this to occur, activation should make use of hyponomy. M. Burke’s findings on hypernym activation imply that a model will need to be developed, in order to decrease the activations as the hypernym tree is traversed.
+
+\subsection{Disambiguation System}
+\label{sec:PADisambiguate}
+
+The multiple access model, and, by extension, the context-sensitive model, requires the usage of both context and frequency to disambiguate tokens.  A system for both methods will need to be developed to ensure that word meanings can be found, regardless of strength of context. There must exist some method of deciding when contextual disambiguation is appropriate, and frequency based methods are not (and vice versa).
+
+A contextual based system must make use of the context held within the system by accessing the contents of the STM.  M. Burke found using a hyponymy to detect similarity between concepts to be reasonably effective. By using at least this semantic relation, a successful system will be able to select from a number of meanings, given the local context alone.
+
+In cases where context is weak, the context-sensitive model tells us that word frequency is used. Given a word, there must exist some method of finding which of its meanings is most likely. 
 
 
 
@@ -404,18 +431,25 @@ The completed project will be evaluable according to the above critera, with a c
 
 \section{Design and Implementation}
 \label{sec:Implementation}
-The application was implemented using the Python programming language, chosen for the availability of the Natural Language Toolkit (NLTK) \cite{NLTK}. NLTK provides an interface for use with Wordnet and a number of useful corpura (collections of tagged raw text), to be used as test data.
+Given the findings of the literature review, and the definition of the problem given previously, an implementation can be designed. The following section describes the system implemented throughout this project, using psuedocode and diagrams to illustrate. The structure of the section roughly follows the processes conducted by the application, in order, when presented with an input corpus.
 
-\subsection{Corpus Analysis}
+The application was implemented using the Python programming language, chosen for the availability of the Natural Language Toolkit (NLTK) \cite{NLTK}. NLTK provides an interface for use with Wordnet and a number of useful corpura, specifially SemCor, to be used as test data.
+
+\subsection{System Input}
 \label{sec:CorpusAnalysis}
-Using the corpus reader built into NLTK, an entire document can be analaysed as a series of hierachical lists \cite{NLTK}:
+The input of the system is a preprocessed document, structured as a series of of hierachical lists \cite{NLTK}:
 
 \begin{itemize}
-	\item \textbf{Document}, is a list of sentences,
+	\item \textbf{Document}, is a list of paragraphs.
+	\item \textbf{Paragraphs}, each of which is a list of sentences.
 	\item \textbf{Sentences}, each of which is a list of words.
 \end{itemize}
 
-The analyser traverses each of these lists, through a series of loops, processing them a sentance at a time.
+Before a document can be inputted, it must have been syntactically analysed. Each word in a correctly preprocessed document will have a PoS tag, signifying its purpose in the sentance. This tag can the be used to minimise the size of the set of possible definitions.
+
+\subsection{System Output}
+\label{sec:SysOutput}
+Given an input in the form descrbed \hyperref[sec:CorpusAnalysis]{previously}, after processing, the system will output a document tagged using WordNet synsets. Each synset in the output represents the individual meanings of each word in the document.
 
 \subsection{Activation}
 \label{sec:activation} 
@@ -436,7 +470,7 @@ FUNCTION activateHypernyms(synset, depth):
 END FUNCTION
 \end{lstlisting}
 
-The function recursively traverses the tree of hypernyms an example of which is shown in Figure \ref{fig:hypernymTree}, activating each synset until, the model gives a result of less than zero. As the function traverses through each hypernym, the amount they are activated by decreases, favouring less general synsets.
+The function recursively traverses the tree of hypernyms, an example of which is shown in Figure \ref{fig:hypernymTree}, activating each synset until, the model gives a result of less than zero. As the function traverses through each hypernym, the amount they are activated by decreases, favouring less general synsets.
 
 \begin{figure}[h]
 \begin{tikzpicture}[grow=right, sibling distance=5pt, level distance=100pt]
@@ -454,9 +488,9 @@ The function recursively traverses the tree of hypernyms an example of which is 
 
 Upon activation, the synset in question's activation is increased by an amount, dependant upon the hypernym model used (discussed later in this section). The same synset can be activated multiple times within the same sentence, an example of which is shown in Figure \ref{fig:HypernymAct}. In this case, a similar model to \hyperref[sec:MattBurke]{that proposed by M. Burke} \cite{MattBurkePrevious} is used: 
 \[H = \sum\limits_{i=1}^N S_i\] 
-The total acivation increase is equal to the sum of all synset activations within the sentence. 
+The total acivation increase of a synset is equal to the sum of all its activations within the sentence. 
 
-It can be seen that, in Listing \ref{lst:HypernymActivation},there exists a function, hypernymModel. This function is responsible for reducing the activation increase of hypernyms as they become more general (closer to the top of the tree). This function should favour most heavily, less general hypernyms, i.e. those activated by the first few recursions of activateHypernyms. 
+It can be seen that, in Listing \ref{lst:HypernymActivation},  there exists a function, hypernymModel. This function is responsible for reducing the activation increase of hypernyms as they become more general (closer to the top of the tree). This function should favour most heavily, less general hypernyms, i.e. those activated by the first few recursions of activateHypernyms. This prevents more general, and therefore less contextually relevant, synsets from dominating the STM. 
 
 \begin{figure}[h]
 \begin{tikzpicture}
@@ -474,20 +508,19 @@ It may be necessary to tune this function during experimentation, to provide gre
 \[f(x) = -b\log(\frac{x}{a})\]
 where $a$ and $b$ are varied during experimentation, and $x$ is the depth of the hypernym. $a$ defines where the function passes through the x axis, i.e the maximum hypernym depth, and $b$ defines how steep the function is.
 
-When the depth = 0 (i.e. the activation of the root synset) the model would require the calculation of log(0), which is undefined. For this reason, an offset of 0.001 was added, making the final model:
+When the depth = 0 (i.e. the activation of the root synset) the model would require the calculation of log(0), which is undefined. For this reason, an offset was added, with a value of 0.001 being used to reduce its impact on the output of the function, making the final model:
 \[f(x) = -b\log(\frac{x}{a}+0.001)\]
-The size of the offset needed to be small to reduce its impact on the overall model.
 
 
 \subsection{Memory Structures}
 \label{sec:ImplementedMemoryStructures}
 
-Upon activation, the synset in question may enter the memory structures, if it posesses a high enough activation. Both an STS and Episodic Buffer have been implemented, using python classes for each. Interactions between the two memory structures are handled by a Memory Controller. As discussed in the \hyperref[Wordnet]{WordNet section}, WordNet provides a good model of the semantic memory \cite{WN1Introduction},described in the \hyperref[LongTerm]{Long-term Store section}. For this reason it has been used heavily.
+Upon activation, the synset in question may enter the memory structures, if it posesses a high enough activation. Both an STM and Episodic Buffer have been implemented, using python classes for each. Interactions between the two memory structures are handled by a Memory Controller. 
 
-\subsubsection{STS}
-\label{sec:ImplementedSTS}
+\subsubsection{STM}
+\label{sec:ImplementedSTM}
 
-The STS (Stm in psuedocode) can, in a simplified sense, be described as a list containing memory items. These memory items have been implemented in python as an object with two attributes, synset (immutable) and activation (mutable), based upon the contents of the STS in the working memory model. These memory items can be replaced, if a synset with greater activation appears. The process of synset replacement is handled by the swapLowestItem function shown in Listing \ref{lst:swapLowestItem}.
+The STM (Stm in psuedocode) can, in a simplified sense, be described as a list containing memory items. These memory items have been implemented in python as an object with two attributes, synset (immutable) and activation (mutable), based upon the contents of the STM in the working memory model. These memory items can be replaced, if a synset with greater activation appears. The process of synset replacement is handled by the swapLowestItem function shown in Listing \ref{lst:swapLowestItem}.
 
 \begin{lstlisting}[numbers=left, numberstyle=\small, caption={the swapLowestItem function}, captionpos=b, label={lst:swapLowestItem}]
 FUNCTION swapLowestItem(newItem):
@@ -507,24 +540,26 @@ FUNCTION swapLowestItem(newItem):
 END FUNCTION
 \end{lstlisting}
 
-A notable feature of the STS is its limited capacity, as described by G. Miller in 1955 \cite{SevenPlusMinusTwo}. It is for this reason that the ability to swap memory items is required. In the case that the STS isn't full, the new memory item is simply added with no swap taking place.
+A notable feature of the STM is its limited capacity, as described by G. Miller in 1955 \cite{SevenPlusMinusTwo}. It is for this reason that the ability to swap memory items is required. In the case that the STM is not full, the new memory item is simply added with no swap taking place.
+
+In this implementation, there exist two separate STMs for verbs and nouns. Due to the limited information regarding noun-verb relationships currently existing in WordNet, combining nouns and verbs in the same STM offers no benefit to the system, as nouns and verbs do not contribute to each other's activations.
 
 \subsubsection{Episodic Buffer}
 \label{sec:ImplementedEpisodicBuffer}
+The Episodic Buffer described in section \ref{sec:EpisodicBuffer} makes use of imagery generated by sensory data to store information \cite{BaddeleyEpisodicBuffer}. A memory structure modelling this process exactly would not be possible within the scope of this project, therefore, a simplified model had to be created. In this simplified model, the Episodic Buffer still provides a memory for wider context, but does so using a synsets, not imagery.
 
-The purpose of the episodic buffer, is to maintain a list of synsets which have occurred in the STS previously. This allows future activations of synsets which have already occured to receive a boost when activated in the future. Interactions with the Episodic buffer only occcur during the activation of synsets, therefore, all interactions are handled by the Memory Controller.
+The purpose of the episodic buffer, is to maintain a list of synsets which have occurred in the STM previously. This allows future activations of synsets which have already occured to receive a boost when activated in the future. Interactions with the Episodic buffer only occcur during the activation of synsets, therefore, all interactions are handled by the Memory Controller.
 
 \subsubsection{Semantic Memory}
 \label{sec:ImplementedSemanticMemory}
+The Semantic Memory is responsible for maintaining all the semantic knowledge of the system. It was decided that WordNet provided the best solution, with its in depth knowledge of synsets and their relations to one another \cite{WN2Nouns, WN4Verbs}.
 
-The Semantic Memory is responsible for maintaining all the semantic knowledge of the system. It was decided that WordNet provided the best solution, with its in depth knowledge of synsets and their relations to eachother \cite{WN2Nouns, WN4Verbs}.
-
-NLTK's built in WordNet reader \cite{NLTK} was used to interact with WordNet. Throughout the system, synsets are used. Each of these is a reference to a synset present in WordNet, allowing their semantic relationships (accessed through their methods) to be used. 
+NLTK's built in WordNet reader \cite{NLTK} was used to interact with WordNet. The Semantic Memory remains constant throughout the runtime of the system, with it only being used for reference. Throughout the system, WordNet's synsets are used. Each of these is a reference to a synset present in WordNet, allowing their semantic relationships (accessed through their methods) to be used in both activation and disambiguation. 
 
 \subsubsection{Memory Controller}
 \label{sec:ImplementedMemoryController}
 
-A memory controller has been implemented to handle interactions between the STS and episodic buffer. The most notable of its uses is the activation of synsets. In order to activate a synset, the Memory Controller must take into account the whether the synset is present in any of the afformentioned memory structures, and handle the activation accordingly. The activateSynset function, shown in Listing \ref{lst:activateSynset} is responsible for handling this process.
+A memory controller has been implemented to handle interactions between the STM and episodic buffer. The most notable of its uses is the activation of synsets. In order to activate a synset, the Memory Controller must take into account the whether the synset is present in any of the afformentioned memory structures, and handle the activation accordingly. The activateSynset function, shown in Listing \ref{lst:activateSynset} is responsible for handling this process.
 
 \begin{lstlisting}[numbers=left, numberstyle=\small, caption={the activateSynset function}, captionpos=b, label={lst:activateSynset}]
 FUNCTION activateSynset(self, synset, activationModifier):
@@ -532,7 +567,7 @@ FUNCTION activateSynset(self, synset, activationModifier):
             synset.activate(activationModifier)
             RETURN
         ELSE IF episodicBuffer.inContents(synset) THEN
-            newMemItem = MemItem(synset, 1)
+            newMemItem = MemItem(synset, boost)
             newMemItem.activate(activationModifier)
             sendToStm(newMemItem)
             RETURN
@@ -544,7 +579,7 @@ FUNCTION activateSynset(self, synset, activationModifier):
         END IF
 \end{lstlisting}
 
-If the activateSynset finds the synset in the STS, the synset is simply activated using, and remains there. If the synset is not present in the STS, it is activated, and sent to the STS, through the sendToStm function, shown in Listing \ref{lst:sendToStm}, recieving a boost if it has previously existed in the STS (i.e. it is in the Episodic Buffer).
+If the activateSynset finds the synset in the STM, the synset is simply activated using, and remains there. If the synset is not present in the STM, it is activated, and sent to the STM, through the sendToStm function, shown in Listing \ref{lst:sendToStm}, recieving a boost if it has previously existed in the STM (i.e. it is in the Episodic Buffer).
 
 \begin{lstlisting}[numbers=left, numberstyle=\small, caption={the sendToStm function}, captionpos=b, label={lst:sendToStm}]
 FUNCTION sendToStm(inputSynset):
@@ -558,13 +593,13 @@ FUNCTION sendToStm(inputSynset):
 END FUNCTION
 \end{lstlisting}
 
-The sendToStm function, shown in Listing \ref{lst:sendToStm}, is responsible for changing the contents of the STS and updating the Episodic buffer accordingly. The swapLowestItem function, shown in Listing \ref{lst:swapLowestItem} is used to edit the STS. As discussed \hyperref[sec:ImplementedSTS]{previously}, this function can return a synset, if the swap is successful. In this case, sendToStm will add the synset previously in the STS, to the episodic buffer (if it is not already present there).
+The sendToStm function, shown in Listing \ref{lst:sendToStm}, is responsible for changing the contents of the STM and updating the Episodic buffer accordingly. The swapLowestItem function, shown in Listing \ref{lst:swapLowestItem} is used to edit the STM. As discussed \hyperref[sec:ImplementedSTM]{previously}, this function can return a synset, if the swap is successful. In this case, sendToStm will add the synset previously in the STM, to the episodic buffer (if it is not already present there).
 
 Throughout the analysis of a corpus, the activation of a specific memory item can change by either being forgotten or activated.
 
 \subsection{Forgetting}
 \label{sec:forgetting}
-After each sentence is read, all items in the STS must be forgotten (have their activation reduced), so as to comply with Atkinson and Shiffrin's STS model discussed \hyperref[ShortTerm]{previously} \cite{ControlProcessesSTMAtkinson}. The forgetting of the entire contents of the STS is done using a loop, as shown in Listing \ref{lst:ForgetLoop}.
+After each sentence is read, all items in the STM must be forgotten (have their activation reduced), so as to comply with Atkinson and Shiffrin's STM model discussed \hyperref[ShortTerm]{previously} \cite{ControlProcessesSTMAtkinson}. The forgetting of the entire contents of the STM is done using a loop, as shown in Listing \ref{lst:ForgetLoop}.
 
 \begin{lstlisting}[numbers=left, numberstyle=\small, caption={Forget loop}, captionpos=b, label={lst:ForgetLoop}]
 FOR item IN Stm LOOP
@@ -572,13 +607,13 @@ FOR item IN Stm LOOP
 END LOOP
 \end{lstlisting}
 
-The forgetting process occurs after every sentence, giving synsets in the next sentence the opportunity to enter the STS.
+The forgetting process occurs after every sentence, giving synsets in the next sentence the opportunity to enter the STM.
 
-When a synset is forgotten, its activation may fall below a threshold, varied in experimentation. If this occurs, the synset is removed from the STS and, as with the sendToStm function, is added to the Episodic Buffer. This prevents synsets irrelevant to the current context from existing in the STS.
+When a synset is forgotten, its activation may fall below a threshold, varied in experimentation. If this occurs, the synset is removed from the STM and, as with the sendToStm function, is added to the Episodic Buffer. This prevents synsets irrelevant to the current context from existing in the STM.
 
 \subsection{Disambiguation}
 \label{sec:ImplementedDisambiguation}
-Up to this point, we have only discussed the processes involved with changing the contents of the memory structures. The purpose of these memory structures is to provide the surrounding context of a word, to aid in its disambiguation. There exists a delay between the processes described previously (i.e. the initial reading of the sentence) and the disambiguation phase. This delay allows inappropriate synsets to leave the STS before they are used. The duration of this delay is to be adjusted during experimentation.
+Up to this point, we have only discussed the processes involved with changing the contents of the memory structures. The purpose of these memory structures is to provide the surrounding context of a word, to aid in its disambiguation. There exists a delay between the processes described previously (i.e. the initial reading of the sentence) and the disambiguation phase. This delay allows inappropriate synsets to leave the STM before they are used. The duration of this delay is to be adjusted during experimentation.
 
 As discussed in the \hyperref[sec:DisambiguationModels]{Disambiguation Models section}, the multiple access model relies upon context and frequency, using whichever is stronger for disambiguation \cite{PsychologyOfLanguage}. The system discussed in this section makes use of both of these, through the disambiguate function, shown in Listing \ref{lst:disambiguate}.
 
@@ -599,11 +634,13 @@ FUNCTION disambiguate(synsetList):
 END FUNCTION
 \end{lstlisting}
 
+As can be seen in Listing \ref{lst:disambiguate}, the function decides between context and frequency in a simple manner. Initially, a contextual approach is attempted. It is assumed that, if a result can be produced using such an approach, the local context is strong enough to confidently provide a solution. In cases where the contextual approach fails, i.e. weak context, synset frequency is employed.
+
 \subsubsection{Context}
 \label{sec:DisambiguationContext}
-The context used for disambiguation its taken from two sources, the STS and knowledge of noun-verb relationships (the latter is discussed in the \hyperref[sec:Sanity]{Sanity Checking Section}).
+The context used for disambiguation its taken from the STM and knowledge of noun-verb relationships (the latter is discussed in the \hyperref[sec:Sanity]{Sanity Checking Section}).
 
-Initially, the context contained in the STS is used. Two algorithms for disambiguation using this context have been implemented, one using hyponyms and one using hypernyms.
+Initially, the context contained in the STM is used. Two algorithms for disambiguation using this context have been implemented, one using hyponyms and one using hypernyms.
 
 As discussed in the \hyperref[sec:MattBurke]{Previous Works section}, M. Burke found that hyponym based searching (previously called STM-First), using the Stm is the most effective method of disambiguation \cite{MattBurkePrevious}. This method works upon the assumption that the contents of the Stm are relatively general (i.e. exist high up in the Wordnet hierarchy). The implementation of this search is given by the hyponymSearch function, shown in Listing \ref{lst:hyponymSearch}.
 
@@ -629,7 +666,7 @@ FUNCTION hyponymSearch(synsetList, searchItem):
 
 This function traverses through all hyponyms of a given synset (searchItem) until either, a match with a synset in the synsetList is found, or the function reaches the base of the tree. If a match is found, the matched synset is returned as the correct word meaning.
 
-Another algorithm, shown in Listing \ref{lst:hypernymSearch}, for disambiguation has also been implemented, using the lowest{\_}common{\_}hypernym method implemented in NLTK's WordNet reader \cite{NLTK}. This algorithm instead searches the hypernyms of both the word to disambiguate and the item in the STS, to find whether a common hypernym exists. If a common hypernym does exist, it is checked to ensure it is not too general (e.g. the common hypernym could be "entity" which is a hypernym of all nouns), and the synset is returned as the correct meaning.
+Another algorithm, shown in Listing \ref{lst:hypernymSearch}, for disambiguation has also been implemented, using the lowest{\_}common{\_}hypernym method implemented in NLTK's WordNet reader \cite{NLTK}. This algorithm instead searches the hypernyms of both the word to disambiguate and the item in the STM, to find whether a common hypernym exists. If a common hypernym does exist, it is checked to ensure it is not too general (e.g. the common hypernym could be "entity" which is a hypernym of all nouns), and the synset is returned as the correct meaning.
 
 \begin{lstlisting}[numbers=left, numberstyle=\small, caption={THE HYPERNYMSEARCH FUNCTION}, captionpos=b, label={lst:hypernymSearch}]
 FUNCTION hypernymSearch(synsetList, searchItem):
@@ -669,15 +706,15 @@ FUNCTION mostLikelySynset(synsetList):
 END FUNCTION
 \end{lstlisting}
 
-As stated previously, in cases where context cannot provide a viable synset, the above is used for disambiguation.
+As stated previously, in cases where context cannot provide a viable synset, the above is used for disambiguation. In these cases, it is assumed that this approach will always provide some result.
 
 \subsubsection{Sanity Checking}
 \label{sec:Sanity}
 Given the sentence:
 \[He\: fixed\: the\: bug\]
-The reader knows that "bug" refers to a computer bug, due to its use with the verb "fixed". So far, the system has no way of modelling the contextual effects of nouns on verbs, so the system is likely to produce invalid sentences. For this reason, post-disambiguation sanity checks occur.
+The reader knows that "bug" refers to a computer bug, due to its use with the verb "fixed". So far, the system has no way of modelling the contextual effects of verbs on nouns, and vice versa, so the system is likely to produce invalid sentences. For this reason, post-disambiguation sanity checks have been implemented.
 
-Though a proposed feature, WordNet does not currently contain relationships between nouns and verbs \cite{WN4Verbs}. For this reason, the information had to be extracted from the available corpus. It was decided that half of the test corpus would be used for the extraction, so that test data used for evaluation would be completely new to the system.
+Though a proposed feature, WordNet does not currently contain relationships between nouns and verbs \cite{WN4Verbs}. For this reason, the information had to be extracted from the available corpus. It was decided that a subset of the SemCor corpus would be used for the extraction, leaving the rest for testing, so that test data used for evaluation would be completely new to the system.
 
 Listing \ref{lst:verbDistance} shows the algorithm used for extracting this information. Nouns which occur in the same sentence as a specific Verb are considered valid partners to the Verb, and are added to a dictionary for quick lookup.
 
@@ -735,13 +772,13 @@ It may be noted that sanityCheck only considers verb incorrectness. As stated in
 
 \section{Results and Evaluation}
 \label{sec:EvResults}
-Throughout this section, the system described previously, in section \ref{sec:Implementation}, will be evaluated. Each part of the system will be evaluated, with their parameters being adjusted, to produce the optimal performance. The criteria described in the \hyperref[sec:ProjectAim]{Project Aims subsection} will also be used to evaluate the system as a whole.
+Throughout this section, the system described previously, in section \ref{sec:Implementation}, will be evaluated. Each part of the system will be tested, with their parameters being adjusted, to produce the optimal performance. 
 
-In order to test the system, the SEMCOR corpus, described in subsection \ref{sec:SEMCOR}, will be used. With the \hyperref[sec:Sanity]{sanity checking system} requiring data to be extracted from the corpus, a subsection of the corpus will need to be used for testing alone. The rest of the corpus can then be used for data extraction, without skewing the results of testing in the positive direction.
+In order to test the system, the SEMCOR corpus, described in ection \ref{sec:SEMCOR}, will be used. With the \hyperref[sec:Sanity]{sanity checking system} requiring data to be extracted from the corpus, a subsection of the corpus will need to be used for testing alone. The rest of the corpus can then be used for data extraction, without skewing the results of testing in the positive direction.
 
 For the purposes of parameter adjustment, the system will be tested on a single document, to reduce the time taken for each test. This will be taken into account when evaluating the results of this process. The system will then be tested across 5 documents ranging across a variety of topics. This will give a more thorough indication of the system's actual performance. 
 
-Two critera will be used to evaluate each part of the system, accuracy and the amount of synsets directly seen in the STS. As many would expect, a higher value for the accuracy would imply a more successful system. The number of directly seen synsets is a less clear method for evaluation. A high number of synsets directly seen would imply that the either, the local context of a word is not strong, or the STS has failed to correctly represent the local context. An effective STS would contain hypernyms of the words in each sentence, meaning the more general concepts of the context are represented.
+Two critera will be used to evaluate each part of the system, accuracy and the amount of synsets directly seen in the STM. As many would expect, a higher value for the accuracy would imply a more successful system. The number of directly seen synsets is a less clear method for evaluation. A high number of synsets directly seen would imply that the either, the local context of a word is not strong, or the STM has failed to correctly represent the local context. An effective STM would contain hypernyms of the words in each sentence, meaning the more general concepts of the context are represented.
 
 \subsection{Random Chance}
 \label{sec:EvRandomChance}
@@ -755,21 +792,21 @@ The next step up from the Random Chance system would be one which relies upon th
 
 When tested, this system performs significantly better than \hyperref[sec:EvFrequency]{random chance}, with an accuracy of 12\%. Even though it is an improvement, it can be seen that Frequency alone does not produce a satisfying result. From this, we can tell that frequenncy only plays a small part in the disambiguation of text, and contextual information is required for a more effective system.
 
-\subsection{STS}
-\label{sec:EvSTS}
-In order to introduce contextual information, the STS, described in Section \ref{sec:ImplementedSTS} can be used. The STS system has many parameters which can be varied, so the process of testing will have to be broken down.
+\subsection{STM}
+\label{sec:EvSTM}
+In order to introduce contextual information, the STM, described in Section \ref{sec:ImplementedSTM} can be used. The STM system has many parameters which can be varied, so the process of testing will have to be broken down.
 
-\subsubsection{STS Size}
-\label{sec:EvSTSSize}
-In section \ref{ShortTerm}, it was identified that the size of the STS existed in the range of 7$\pm$2 items. In order to find the optimal value for this STS system, each size in the range will need to be tested.
+\subsubsection{STM Size}
+\label{sec:EvSTMSize}
+In section \ref{ShortTerm}, it was identified that the size of the STM existed in the range of 7$\pm$2 items. In order to find the optimal value for this STM system, each size in the range will need to be tested.
 
-A larger STS could give a broader impression of the local context, with more synsets being present. The ability to hold more synsets could also lead to ambiguity existing in the STS, with multiple synsets relating to different possible definitions of each word being present. Reducing STS size would decrease the possibility for ambiguity, but it could also reduce the amount of context the system is able to represent.
+A larger STM could give a broader impression of the local context, with more synsets being present. The ability to hold more synsets could also lead to ambiguity existing in the STM, with multiple synsets relating to different possible definitions of each word being present. Reducing STM size would decrease the possibility for ambiguity, but it could also reduce the amount of context the system is able to represent.
 
 \begin{table}
 \begin{center}
 \begin{tabular}{|p{8em}|p{8em}|p{8em}|}
 	\hline
-	STS size & Accuracy (\%) & Directly Seen (\%) \\
+	STM size & Accuracy (\%) & Directly Seen (\%) \\
 	\hline
 	5 & 47 & 48\\
 	\hline
@@ -783,13 +820,13 @@ A larger STS could give a broader impression of the local context, with more syn
 	\hline
 \end{tabular}
 \end{center}
-\caption{The effect of STS size on system performance}
-\label{table:STSSize}
+\caption{The effect of STM size on system performance}
+\label{table:STMSize}
 \end{table}
 
-As can be seen in table \ref{table:STSSize}, an increased STS size leads to a minimal decrease in the accuracy of the system. Contrary to this, the number of synsets directly seen increases significantly, implying the STS's ability to represent the local context, is hindered by a larger size.
+As can be seen in table \ref{table:STMSize}, an increased STM size leads to a minimal decrease in the accuracy of the system. Contrary to this, the number of synsets directly seen increases significantly, implying the STM's ability to represent the local context, is hindered by a larger size.
 
-Given the results of this test, it has een decided that 5 is the optimal size for the STS. When presented with a larger number of test documents, the system performs with an accuracy of 35\%, having 45\% of synsets directly seen in the STS. This is significantly better performance than \hyperref[sec:EvFrequency]{ a system based soley on frequency}.
+Given the results of this test, it has een decided that 5 is the optimal size for the STM. When presented with a larger number of test documents, the system performs with an accuracy of 35\%, having 45\% of synsets directly seen in the STM. This is significantly better performance than \hyperref[sec:EvFrequency]{ a system based soley on frequency}.
 
 \subsubsection{Activation Function}
 \label{sec:EvActivation}
@@ -799,7 +836,7 @@ The activation function, described in section \ref{sec:activation}, is responsib
 
 In the function described in section \ref{sec:activation}, shown above, there exist two variables, $a$ and $b$, which can be changed. The maximum hypernym depth, given by $a$, will be varied in a range from 1 to 5, and the value of $b$ will be varied between 1 and $\frac{1}{16}$.
 
-For the first test, $a$ will be varied, and $b$ will remain constant, with value 1. A small value for $a$ would lead to no hypernyms being activated, causing a loss of generality in the STS, meaning poor representation of the local context. With large values, the contents of the STS could become too general, giving the same problems as a small $a$.
+For the first test, $a$ will be varied, and $b$ will remain constant, with value 1. A small value for $a$ would lead to no hypernyms being activated, causing a loss of generality in the STM, meaning poor representation of the local context. With large values, the contents of the STM could become too general, giving the same problems as a small $a$.
 
 \begin{table}
 \begin{center}
@@ -825,7 +862,7 @@ For the first test, $a$ will be varied, and $b$ will remain constant, with value
 
 Given the results shown in table \ref{table:aActivation}, the best performance is given when $a = 2$. For this reason, the value of 2 will be used when testing different values for $b$.
 
-A high value of $b$ would favour less general synsets significantly more than their hypernyms. Smaller values would reduce this effect, though more general synsets may come to dominate the STS, leading to poor representation of local context.
+A high value of $b$ would favour less general synsets significantly more than their hypernyms. Smaller values would reduce this effect, though more general synsets may come to dominate the STM, leading to poor representation of local context.
 
 \begin{table}
 \begin{center}
@@ -849,11 +886,11 @@ A high value of $b$ would favour less general synsets significantly more than th
 \label{table:bActivation}
 \end{table}
 
-Given the results shown in table \ref{table:bActivation}, it can be seen that a value of 1 for $b$, achieves the best balance between accuracy and the number of synsets directly seen. With more testing data, the system produces an accuracy of 35\%. This is no imporvement from the previously used method. Though the accuracy has remained consistent, only 39\% of synsets were directly seen, implying more generality in the STS, without loss of performance.
+Given the results shown in table \ref{table:bActivation}, it can be seen that a value of 1 for $b$, achieves the best balance between accuracy and the number of synsets directly seen. With more testing data, the system produces an accuracy of 35\%. This is no imporvement from the previously used method. Though the accuracy has remained consistent, only 39\% of synsets were directly seen, implying more generality in the STM, without loss of performance.
 
 \subsection{Episodic Buffer}
 \label{sec:EvEpisodicBuffer}
-The episodic buffer, described in section \ref{sec:ImplementedEpisodicBuffer} aims to provide a more global context than the STS. With the functionality of the buffer being relatively simple, only one varibale exists, the boost provided by a previously seen synset, with a greater boost giving global context a larger impact on disambiguation. The size of this boost will be varied between 0 (i.e. no episodic buffer) and 2.
+The episodic buffer, described in section \ref{sec:ImplementedEpisodicBuffer} aims to provide a more global context than the STM. With the functionality of the buffer being relatively simple, only one varibale exists, the boost provided by a previously seen synset, with a greater boost giving global context a larger impact on disambiguation. The size of this boost will be varied between 0 (i.e. no episodic buffer) and 2.
 
 \begin{table}
 \begin{center}
@@ -877,7 +914,7 @@ The episodic buffer, described in section \ref{sec:ImplementedEpisodicBuffer} ai
 \label{table:EBboost}
 \end{table}
 
-The results in table \ref{table:EBboost} show that the use of an episodic buffer dramatically improves performance, with an optimal boost of 1.5. When provided with 5 documents, as opposed to 1 when tuning parameters, the system produces an accuracy of 39\%, with 23\% of synsets directly seen, giving an increase in both accuracy, and the generality of the STS. 
+The results in table \ref{table:EBboost} show that the use of an episodic buffer dramatically improves performance, with an optimal boost of 1.5. When provided with 5 documents, as opposed to 1 when tuning parameters, the system produces an accuracy of 39\%, with 23\% of synsets directly seen, giving an increase in both accuracy, and the generality of the STM. 
 
 \subsection{Disambiguation}
 \label{sec:EvDisambiguation}
@@ -907,7 +944,7 @@ As can be seen, the hypernym based algorithm produces no benefit over the usage 
 
 \subsubsection{Delay}
 \label{sec:EvDisDelay}
-In section \ref{sec:ImplementedDisambiguation}, a delay between reading and disambiguation is proposed. This delay is measured in sentences read, and will be varied between 0 and 2. A larger delay could cause the local context of a word to be underrepresented when disambiguation takes place, though it may also give the system chance to resolve ambiguity in the STS, before its contents are used.
+In section \ref{sec:ImplementedDisambiguation}, a delay between reading and disambiguation is proposed. This delay is measured in sentences read, and will be varied between 0 and 2. A larger delay could cause the local context of a word to be underrepresented when disambiguation takes place, though it may also give the system chance to resolve ambiguity in the STM, before its contents are used.
 
 \begin{table}
 \begin{center}
@@ -927,7 +964,7 @@ In section \ref{sec:ImplementedDisambiguation}, a delay between reading and disa
 \label{table:Delay}
 \end{table}
 
-Delaying disambiguation by 2 sentences has a positive effect on the overall performance of the system, as shown in table \ref{table:Delay}. The most notable effect of the delay, is the reduction in synsets directly seen. This shows that the delay gives the system time to remove less general synsets from the STS. When provided with more input data, the improvement is still present, with an accuracy of 40\%, and 15\% of synsets directly seen.
+Delaying disambiguation by 2 sentences has a positive effect on the overall performance of the system, as shown in table \ref{table:Delay}. The most notable effect of the delay, is the reduction in synsets directly seen. This shows that the delay gives the system time to remove less general synsets from the STM. When provided with more input data, the improvement is still present, with an accuracy of 40\%, and 15\% of synsets directly seen.
 
 \subsubsection{Sanity Checking} 
 \label{sec:EvDisSanity}
@@ -951,13 +988,21 @@ The sanity checking system, described in section \ref{sec:Sanity}, makes use of 
 
 As it can be seen in table \ref{table:Sanity}, sanity checking reduces the accuracy of the system. For this reason, it can be seen that it is not useful in its current state, and can be eliminated from the system.
 
+\subsection{STM Trace}
+\label{sec:EvTrace}
+In \hyperref[sec:AppA]{Appendix A}, listing \ref{lst:STMTrace}, a trace of the contents of both STMs during runtime is given. The noun STM is given by the top STM list, and verbs by the bottom STM list. Below both STM traces, the sentence giving the current activations is shown.
+
+When observing the performance of the noun STM, it can be seen that there exists some abiguity, with some words having multiple possible meanings in the STM. In these cases, it can be seen that there exist few possible options for each word. From this we can say that the system has minimised the number of possibilities for each option.
+
+When compared to the noun STM, the verb STM contains much more abiguity. This is likely due, in part, to the larger number of possible meanings for each word. This effect was not unexpected,hence the inclusion of sanity checks, described in section \ref{sec:Sanity} Though these were shown to be ineffective in an earlier section.
+
 \subsection{Overall Evaluations}
 \label{EvOverall}
-The system as a whole has offered an improvement over frequency analysis, with an accuracy of 40\% compared to 12\%. All but one aspect of the system provided some benefit to the process of semantic analysis, with \hyperref[sec:EvSanity]{Saity Checking} unfortunately failing to offer any improvement. 
+The system as a whole has offered an improvement over frequency analysis, with an accuracy of 40\% compared to 12\%. All but one aspect of the system provided some benefit to the process of semantic analysis, with \hyperref[sec:EvDisSanity]{Saity Checking} unfortunately failing to offer any improvement. 
 
 It can be seen, when comparing testing data (one document analysed) to evaluation data (five documents analysed), that the system performed significantly better over some documents than others. This difference is likely due to the level of ambiguity in the input text, with a news piece being used for testing, and topics covering opinion and fiction being used for evaluation.
 
-
+The \hyperref[sec:EvTrace]{STM traces} show an increase in abiguity in the STM for verbs, when compared to nouns. This effect is further shown in the accuracy improvement when testing exclusively on nouns, with an increased accuracy of 46\%.
 
 
 
@@ -967,26 +1012,28 @@ This project has aimed to utlise previously established psychological models of 
 
 \subsection{Project Aims}
 \label{ConcAims}
-In section \ref{sec:ProjectAim}, three aims for the project were established. All three aims have been met, with varying degrees of success.
+In section \ref{sec:ProbAnalysis}, three aims for the project were established. All three aims have been met, with varying degrees of success.
 
 \begin{enumerate}
-	\item \textbf{A computational model of memory structures} \newline
-		As part of this project, three memory structures have been produced, STS, LTS and the Episodic Buffer.
+	\item \textbf{Memory Structures} \newline
+		As part of this project, three memory structures have been produced, STM, LTM and the Episodic Buffer.
 		\begin{itemize}
-			\item The STS is a memory structure capable of holding a finite amount of data regarding the local context of a sentence. In the implementation of this project two STSs were used, one for verbs and the other for nouns. This decision does not follow the Badeley's model, in which there exists only one STS, containing data regarding all word types \cite{MemoryBaddeleyEysenkAnderson}. With that said, words are able to move to and from the STS, each with its own activation level.
+			\item The STM is a memory structure capable of holding a finite amount of data regarding the local context of a sentence. In the implementation of this project two STMs were used, one for verbs and the other for nouns. This decision does not follow the Badeley's model, in which there exists only one STM, containing data regarding all word types \cite{MemoryBaddeleyEysenkAnderson}. With that said, words are able to move to and from the STM, each with its own activation level.
 			
-			\item The LTS, provided by WordNet, contains a large number of synsets connected to one another by semantic links. Hyponomy was the most heavily used of these links, though others such as meronymy, were not used. The functions of nouns were represented using separate dictionaries, due to the fact that WordNet does not yet contain this information, though these dictionaries were far from complete.
+			\item The LTM, provided by WordNet, contains a large number of synsets connected to one another by semantic links. Hyponomy was the most heavily used of these links, though others such as meronymy, were not used. The functions of nouns were represented using separate dictionaries, due to the fact that WordNet does not yet contain this information, though these dictionaries were far from complete.
 			
 			\item The Episodic Buffer was shown in testing to have a significant effect on accuracy. This is likely due to its ability to correctly represent the global context of a document. In this implementation, items would never leave the episodic buffer, meaning that synsets that appear early in the document, can still affect activation, long after context has changed.
 		\end{itemize}		 
 		
-	\item \textbf{A system for reading in a corpus} \newline
-		The system uses atctivation and forgetting to model the same prrocesses which exist in Atkinson and Shiffrin's model \cite{ControlProcessesSTMAtkinson}. As the input corpus is read, these processes occur for each word, causing context to be represented by the STS and Episodic Buffer. 
+	\item \textbf{Reading System} \newline
+		The system uses atctivation and forgetting to model the same prrocesses which exist in Atkinson and Shiffrin's model \cite{ControlProcessesSTMAtkinson}. As the input corpus is read, these processes occur for each word, causing context to be represented by the STM and Episodic Buffer. 
+		
+		The STM trace, discussed in section \ref{sec:EvTrace}, shows that in some cases, such as that shown in \hyperref[sec:AppA]{Appendix A}, listing \ref{lst:STMTrace}, ambiguity can arise in the STM. This could be improved by \hyperref[sec:FutureSemantic]{more effective sanity checks}, and the usage of an \hyperref[sec:FutureSemantic]{increased number of semantic links}.
 	
 		
 	
-	\item \textbf{A computational model of disambiguation} \newline
-		The disambiguation model makes heavy use of the contents of the STS, in conjunction with the hyponomy relation. Frequency is also used in cases where the correct synset can not be identified using context alone, fitting with the Multiple Access Model \cite{PsychologyOfLanguage}. Unfortunatly, the disambiguation system only produced an accuracy of 40\%, which, though significantly better than frequency analysis alone (12\%), is not good enough to be directly useful. 
+	\item \textbf{Disambiguation System} \newline
+		The disambiguation model makes heavy use of the contents of the STM, in conjunction with the hyponomy relation. Frequency is also used in cases where the correct synset can not be identified using context alone, fitting with the Multiple Access Model \cite{PsychologyOfLanguage}. Unfortunatly, the disambiguation system only produced an accuracy of 40\%, which, though significantly better than frequency analysis alone (12\%), is not good enough to be directly useful. 
 	
 
 \end{enumerate}
@@ -1024,5 +1071,66 @@ In this noun phrase, we know that "cloud" does not refer to the internet, becaus
 \newpage
 \bibliography{references}
 \bibliographystyle{IEEEtran}
+
+\newpage
+\appendix
+\section*{Appendix A}
+\label{sec:AppA}
+\begin{lstlisting}[caption={A trace of the STM throughout runtime}, captionpos=b, label={lst:STMTrace}]
+
+==========================================
+---------------------------------
+Synset('jury.n.01') - 2.2015449935
+Synset('jury.n.02') - 2.2015449935
+Synset('execution.n.06') - 0.400514997832
+Synset('implementation.n.02') - 0.400514997832
+Synset('police.n.01') - 0.400514997832
+---------------------------------
+---------------------------------
+Synset('state.v.01') - 1.79514049042
+Synset('allege.v.01') - 1.7015449935
+Synset('suppose.v.01') - 1.7015449935
+Synset('read.v.02') - 1.7015449935
+Synset('claim.v.04') - 1.40051499783
+---------------------------------
+
+Implementation Georgia automobile title law recommended jury 
+==========================================
+---------------------------------
+Synset('execution.n.06') - 1.90051499783
+Synset('implementation.n.02') - 1.90051499783
+Synset('law.n.01') - 1.90051499783
+Synset('law.n.02') - 1.90051499783
+Synset('police.n.01') - 1.90051499783
+---------------------------------
+---------------------------------
+Synset('state.v.01') - 1.3263389894
+Synset('allege.v.01') - 1.2015449935
+Synset('suppose.v.01') - 1.2015449935
+Synset('read.v.02') - 1.2015449935
+Synset('take.v.02') - 1.15040647846
+---------------------------------
+
+urged Legislature provide funds re-set date implementation law be effected 
+==========================================
+---------------------------------
+Synset('funds.n.01') - 1.90051499783
+Synset('fund.n.01') - 1.90051499783
+Synset('store.n.02') - 1.90051499783
+Synset('investment_company.n.01') - 1.90051499783
+Synset('execution.n.06') - 1.40051499783
+---------------------------------
+---------------------------------
+Synset('take.v.01') - 1.90051499783
+Synset('take.v.02') - 1.90051499783
+Synset('lead.v.01') - 1.90051499783
+Synset('take.v.04') - 1.90051499783
+Synset('claim.v.04') - 1.90051499783
+---------------------------------
+
+grand jury took a swipe at handling funds child welfare services foster homes 
+=====================
+
+\end{lstlisting}
 
 \end{document}
