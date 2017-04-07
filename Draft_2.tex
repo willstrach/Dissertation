@@ -31,7 +31,7 @@
         \vspace{0.8cm}
         
         \Large
-        Wordcount - 10640\\
+        Wordcount - 10716\\
         \small
         (Wordcount produced using wc - w, \\
         this includes all the body of the report,\\
@@ -1012,7 +1012,7 @@ This project has aimed to utlise previously established psychological models of 
 
 \subsection{Project Aims}
 \label{ConcAims}
-In section \ref{sec:ProbAnalysis}, three aims for the project were established. All three aims have been met, with varying degrees of success.
+In section \ref{sec:ProbAnalysis}, the problem was discussed and outlined. As part of this, three sub-problems were established. A solution for each of these problems has been produced, with varying degrees of success.
 
 \begin{enumerate}
 	\item \textbf{Memory Structures} \newline
@@ -1030,15 +1030,15 @@ In section \ref{sec:ProbAnalysis}, three aims for the project were established. 
 		
 		The STM trace, discussed in section \ref{sec:EvTrace}, shows that in some cases, such as that shown in \hyperref[sec:AppA]{Appendix A}, listing \ref{lst:STMTrace}, ambiguity can arise in the STM. This could be improved by \hyperref[sec:FutureSemantic]{more effective sanity checks}, and the usage of an \hyperref[sec:FutureSemantic]{increased number of semantic links}.
 	
-		
-	
 	\item \textbf{Disambiguation System} \newline
-		The disambiguation model makes heavy use of the contents of the STM, in conjunction with the hyponomy relation. Frequency is also used in cases where the correct synset can not be identified using context alone, fitting with the Multiple Access Model \cite{PsychologyOfLanguage}. Unfortunatly, the disambiguation system only produced an accuracy of 40\%, which, though significantly better than frequency analysis alone (12\%), is not good enough to be directly useful. 
+		The disambiguation model makes heavy use of the contents of the STM, in conjunction with the hyponomy relation. There also exists an implementation of a sanity check system, which allows verbs to impact the disambiguation of nouns, and vice versa. Frequency is also used in cases where the correct synset can not be identified using context alone, fitting with the Multiple Access Model \cite{PsychologyOfLanguage}. 
+		
+		Unfortunatly, the disambiguation system only produced an accuracy of 40\%, which, though significantly better than frequency analysis alone (12\%), is not good enough to be directly useful. This figure is improved to 46\%, if only nouns are considered. The noun-verb relationship based system, negatively impacted performance, though with improvement to the size of the training data set may provide a more useful solution.
 	
 
 \end{enumerate}
 
-The seemingly low accuracy of the system does not imply that it is is of not of use. We can see that it is capable of finding the correct synset in some cases. In others, it is not unlikely that the system reduced the number of possibilities to a smaller subset, and from then, failed to select the correct option. In this case, the described implementation could be used to reduce the number of possibilities, which in turn could be made smaller still by some future extension.
+The seemingly low accuracy of the system does not imply that it is is of not of use. We can see that it is capable of finding the correct synset in some cases. In others, as can be seen in during the \hyperref[sec:STMTrace]{STM trace}, the system reduced the number of possibilities to a smaller subset, and from then, failed to select the correct option. In this case, the described implementation could be used to reduce the number of possibilities, which in turn could be made smaller still by some future extension.
 
 
 \subsection{Future Extensions}
