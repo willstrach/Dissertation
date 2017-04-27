@@ -31,7 +31,7 @@
         \vspace{0.8cm}
         
         \Large
-        Wordcount - 11799\\
+        Wordcount - 11798\\
         \small
         (Wordcount produced using wc - w, \\
         this includes all the body of the report,\\
@@ -58,6 +58,8 @@ Semantic Analysis is the process of giving meaning to the tokens of a sentence. 
 \newpage
 
 \tableofcontents
+\listoffigures
+\listoftables
 
 
 \newpage
@@ -102,6 +104,9 @@ it is known by the reader that “party” refers to a political party, due to t
 It can be seen that the study of the brain's processes of semantic analysis, and their application to a computational model, could provide a satisfying solution. A great deal of research is directed at studying these processes, largely influenced by the Working Memory model proposed by Baddeley \cite{MemoryBaddeleyEysenkAnderson}. This memory model describes a system of structures, which work in conjunction with one another to form a representation of the brain’s input. 
 
 The Working Memory model has many more applications than the one described in the coming report, requiring more structures than are relevant to the process of semantic analysis. For the purposes of this application, we will restrict our focus to three of these memories, short-term, long-term, and the Episodic buffer\cite{MemoryBaddeleyEysenkAnderson}; each of which is described in greater detail in the Literature review.
+
+\subsection{Problem Definition}
+\label{sec:IntroProbDef}
 
 The following report will discuss and define a potential computational model of the psychological theories surrounding the process of Semantic Analysis, with a specific focus on Baddeley's Working Memory Model. As part of the project, a system will be built, and tested against an input corpus. Due to time, and performance constraints, a level of abstraction will be required. It is the purpose of this testing to decide whether the level of abstraction used provides a satisfactory performance.
 
@@ -1125,9 +1130,7 @@ This project hit a number of the aims discussed in section \ref{sec:ProbAnalysis
 \appendix
 \section*{Appendix A}
 \label{sec:AppA}
-\begin{lstlisting}[caption={A trace of the STM throughout runtime}, captionpos=b, label={lst:STMTrace}]
-
-==========================================
+\begin{lstlisting}[caption={A trace of the STM throughout runtime}, captionpos=b, label={lst:STMTrace}, basicstyle=\small]
 ---------------------------------
 Synset('jury.n.01') - 2.2015449935
 Synset('jury.n.02') - 2.2015449935
@@ -1135,14 +1138,12 @@ Synset('execution.n.06') - 0.400514997832
 Synset('implementation.n.02') - 0.400514997832
 Synset('police.n.01') - 0.400514997832
 ---------------------------------
----------------------------------
 Synset('state.v.01') - 1.79514049042
 Synset('allege.v.01') - 1.7015449935
 Synset('suppose.v.01') - 1.7015449935
 Synset('read.v.02') - 1.7015449935
 Synset('claim.v.04') - 1.40051499783
 ---------------------------------
-
 Implementation Georgia automobile title law recommended jury 
 ==========================================
 ---------------------------------
@@ -1152,14 +1153,12 @@ Synset('law.n.01') - 1.90051499783
 Synset('law.n.02') - 1.90051499783
 Synset('police.n.01') - 1.90051499783
 ---------------------------------
----------------------------------
 Synset('state.v.01') - 1.3263389894
 Synset('allege.v.01') - 1.2015449935
 Synset('suppose.v.01') - 1.2015449935
 Synset('read.v.02') - 1.2015449935
 Synset('take.v.02') - 1.15040647846
 ---------------------------------
-
 urged Legislature provide funds re-set date implementation law be effected 
 ==========================================
 ---------------------------------
@@ -1169,14 +1168,12 @@ Synset('store.n.02') - 1.90051499783
 Synset('investment_company.n.01') - 1.90051499783
 Synset('execution.n.06') - 1.40051499783
 ---------------------------------
----------------------------------
 Synset('take.v.01') - 1.90051499783
 Synset('take.v.02') - 1.90051499783
 Synset('lead.v.01') - 1.90051499783
 Synset('take.v.04') - 1.90051499783
 Synset('claim.v.04') - 1.90051499783
 ---------------------------------
-
 grand jury took a swipe at handling funds child welfare services foster homes 
 =====================
 
